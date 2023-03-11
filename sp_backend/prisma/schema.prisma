@@ -15,6 +15,19 @@ model Group {
   name     String
   usersIds String[] @db.ObjectId
   users    User[]   @relation(fields: [usersIds], references: [id])
+  bills    Bill[]
+  requests JoinRequest[] 
+}
+
+model JoinRequest {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  groupId   String @db.ObjectId
+  group     Group  @relation(fields: [groupId], references: [id])
+  userId    String @db.ObjectId
+  user      User   @relation("received",fields: [userId], references: [id])
+  byUserId  String @db.ObjectId
+  byUser    User   @relation("sent",fields: [byUserId], references: [id])
+  status    Status
 }
 
 model User {
@@ -25,4 +38,37 @@ model User {
   password String
   groupIds String[] @db.ObjectId
   groups   Group[]  @relation(fields: [groupIds], references: [id])
+  bills    Bill[]
+  owes     Owe[]
+  receivedRequests JoinRequest[] @relation("received")
+  sentRequests JoinRequest[] @relation("sent")
 }
+
+model Bill {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  title      String
+  amount     Float
+  groupId    String @db.ObjectId
+  group      Group  @relation(fields: [groupId], references: [id])
+  creditorId String @db.ObjectId
+  creditor   User   @relation(fields: [creditorId], references: [id])
+  owes       Owe[]
+}
+
+enum Status {
+  PENDING
+  ACCEPTED
+  REJECTED
+  PAID
+}
+
+model Owe {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  amount    Float
+  billId    String @db.ObjectId
+  bill      Bill   @relation(fields: [billId], references: [id])
+  debtorId  String @db.ObjectId
+  debtor    User   @relation(fields: [debtorId], references: [id])
+  status    Status
+}
+

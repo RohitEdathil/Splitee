@@ -6,11 +6,6 @@ import { editUserValidator } from "./validators";
 const router = Router();
 
 router.get("/:id", userDataController);
-router.post(
-  "/:id",
-  editUserValidator,
-  validationMiddleware,
-  editUserController
-);
+router.post("/", editUserValidator, validationMiddleware, editUserController);
 
 export default router;
