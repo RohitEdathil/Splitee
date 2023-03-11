@@ -1,14 +1,20 @@
 import * as express from "express";
 import * as dotenv from "dotenv";
+import router from "./router";
+import * as morgan from "morgan";
+import { errorMiddleware } from "./error/middleware";
 
 dotenv.config();
 
+const app = express();
 
-const app = express()
+// Middlewares
+app.use(express.json());
+app.use(morgan(process.env.LOG_LEVEL || "dev"));
 
-console.log("Hello");
-
+app.use("/api", router);
+app.use(errorMiddleware);
 
 app.listen(process.env.PORT || 5000, () => {
-    console.log(`Server is listening on port ${process.env.PORT || 5000}`)
-})
+  console.log(`Server is listening on port ${process.env.PORT || 5000}`);
+});
