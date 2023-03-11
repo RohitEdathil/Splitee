@@ -3,10 +3,13 @@ import * as dotenv from "dotenv";
 import router from "./router";
 import * as morgan from "morgan";
 import { errorMiddleware } from "./error/middleware";
+import { initDB } from "./db";
 
 dotenv.config();
 
 const app = express();
+
+initDB();
 
 // Middlewares
 app.use(express.json());

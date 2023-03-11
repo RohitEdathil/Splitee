@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { BadRequestError } from "./types";
 
+import { validationResult } from "express-validator";
+
 function errorMiddleware(
   err: Error,
   req: Request,
@@ -8,14 +10,14 @@ function errorMiddleware(
   next: NextFunction
 ) {
   if (err instanceof BadRequestError) {
-    return res.status(403).send({
+    res.status(403).send({
       error: {
         message: err.message,
       },
     });
   } else {
     console.log(err);
-    return res.status(500).send({
+    res.status(500).send({
       error: {
         message: "Something went wrong",
       },
@@ -23,4 +25,12 @@ function errorMiddleware(
   }
 }
 
-export { errorMiddleware };
+const validationMiddleware = (req, res, next) => {
+  const validationErrors = validationResult(req);
+  if (!validationErrors.isEmpty()) {
+    throw new BadRequestError(validationErrors.array()[0].msg);
+  }
+  next();
+};
+
+export { errorMiddleware, validationMiddleware };
