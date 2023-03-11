@@ -10,7 +10,10 @@ async function signUpController(
   res: Response,
   next: NextFunction
 ) {
-  const { userId, name, password, email } = req.body;
+  const userId: string = req.body.userId;
+  const name: string = req.body.name;
+  const password: string = req.body.password;
+  const email: string = req.body.email;
 
   // Check if the username is taken
   const existingUser = await db.user.findFirst({
@@ -41,8 +44,40 @@ async function signUpController(
   res.json({ token: token });
 }
 
-function signInController(req: Request, res: Response) {
-  // Ensure that all required arguments are present
+async function signInController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const userId: string = req.body.userId;
+  const password: string = req.body.password;
+
+  // Fetch the user
+  const user = await db.user.findFirst({
+    where: {
+      userId: userId,
+    },
+  });
+
+  // No user found
+  if (user == null) {
+    next(new BadRequestError("Invalid username or password"));
+    return;
+  }
+
+  // Check the password
+  const passwordMatch = await compare(password, user.password);
+  if (!passwordMatch) {
+    next(new BadRequestError("Invalid username or password"));
+    return;
+  }
+
+  // Generate the JWT token
+  const token = sign({ userId: userId }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
+
+  res.json({ token: token });
 }
 
 export { signUpController, signInController };

@@ -1,6 +1,6 @@
 import { body } from "express-validator";
 
-const signupValidation = [
+const signUpValidation = [
   body("name")
     .notEmpty()
     .withMessage("Missing name")
@@ -28,4 +28,18 @@ const signupValidation = [
     .withMessage("Invalid username format"),
 ];
 
-export { signupValidation };
+const signInValidation = [
+  body("userId")
+    .notEmpty()
+    .withMessage("Missing userId")
+    .isString()
+    .withMessage("Invalid userId format"),
+
+  body("password")
+    .notEmpty()
+    .withMessage("Missing password")
+    .isString()
+    .withMessage("Invalid password format"),
+];
+
+export { signUpValidation, signInValidation };
