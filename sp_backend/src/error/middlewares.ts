@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { BadRequestError } from "./types";
+import { BadRequestError, UnauthorizedError } from "./types";
 
 import { validationResult } from "express-validator";
 
@@ -15,6 +15,12 @@ function errorMiddleware(
         message: err.message,
       },
     });
+  } else if (err instanceof UnauthorizedError) {
+    res.status(401).send({
+      error: {
+        message: err.message,
+      },
+    });
   } else {
     console.log(err);
     res.status(500).send({
@@ -25,7 +31,7 @@ function errorMiddleware(
   }
 }
 
-const validationMiddleware = (req, res, next) => {
+const validationMiddleware = (req: Request, res, next) => {
   const validationErrors = validationResult(req);
   if (!validationErrors.isEmpty()) {
     throw new BadRequestError(validationErrors.array()[0].msg);
