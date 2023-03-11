@@ -2,7 +2,7 @@ import * as express from "express";
 import * as dotenv from "dotenv";
 import router from "./router";
 import * as morgan from "morgan";
-import { errorMiddleware } from "./error/middleware";
+import { errorMiddleware } from "./error/middlewares";
 import { initDB } from "./db";
 
 dotenv.config();
