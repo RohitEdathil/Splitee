@@ -10,7 +10,7 @@ function errorMiddleware(
   next: NextFunction
 ) {
   if (err instanceof BadRequestError) {
-    res.status(403).send({
+    res.status(400).send({
       error: {
         message: err.message,
       },
