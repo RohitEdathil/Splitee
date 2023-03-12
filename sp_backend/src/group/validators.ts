@@ -19,4 +19,24 @@ const editGroupValidator = [
     .withMessage("Invalid id"),
 ];
 
-export { createGroupValidator, editGroupValidator };
+const inviteUserValidator = [
+  body("groupId")
+    .notEmpty()
+    .withMessage("Group id is required")
+    .isMongoId()
+    .withMessage("Invalid group id"),
+
+  body("toUsers")
+    .notEmpty()
+    .withMessage("Recipient user ids are required")
+    .isArray({ min: 1 })
+    .withMessage("Invalid user ids")
+    .custom((value: any) => {
+      return value.every((id: any) => {
+        return id.match(/^[0-9a-fA-F]{24}$/);
+      });
+    })
+    .withMessage("Invalid user ids"),
+];
+
+export { createGroupValidator, editGroupValidator, inviteUserValidator };
