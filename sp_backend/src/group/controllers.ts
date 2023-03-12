@@ -154,4 +154,94 @@ async function inviteUserController(
   res.status(200).json({ message: "Invites sent" });
 }
 
-export { createGroupController, editGroupController, inviteUserController };
+async function respondInviteController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const inviteId: string = req.body.inviteId;
+  const accept: boolean = req.body.accept;
+  const userId: string = req.userId;
+
+  // Fetch invite
+  const invite = await db.invite.findFirst({
+    where: {
+      id: inviteId,
+    },
+  });
+
+  // Check if invite exists
+  if (!invite) {
+    next(new BadRequestError("Invite does not exist"));
+    return;
+  }
+
+  // Check if invite is pending
+  if (invite.status !== "PENDING") {
+    next(new BadRequestError("Invite is not pending"));
+    return;
+  }
+
+  // Fetch user
+  const user = await db.user.findFirst({
+    where: {
+      userId: userId,
+    },
+  });
+
+  // Check if user is the invitee
+  if (invite.userId !== user.id) {
+    next(new BadRequestError("User is not the invitee"));
+    return;
+  }
+
+  // Accept or decline invite
+  await db.invite.update({
+    where: {
+      id: invite.id,
+    },
+    data: {
+      status: accept ? "ACCEPTED" : "REJECTED",
+    },
+  });
+
+  // If invite is rejected, stop here
+  if (!accept) {
+    res.status(200).json({ message: "Invite rejected" });
+    return;
+  }
+
+  // Fetch group
+  const group = await db.group.findFirst({
+    where: {
+      id: invite.groupId,
+    },
+  });
+
+  // Check if group exists
+  if (!group) {
+    next(new BadRequestError("Group does not exist"));
+    return;
+  }
+
+  // Add user to group
+  await db.group.update({
+    where: {
+      id: group.id,
+    },
+    data: {
+      usersIds: {
+        push: user.id,
+      },
+    },
+  });
+
+  res.status(200).json({ message: "Invite accepted" });
+}
+
+export {
+  createGroupController,
+  editGroupController,
+  inviteUserController,
+  respondInviteController,
+};

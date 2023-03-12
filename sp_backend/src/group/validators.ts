@@ -39,4 +39,22 @@ const inviteUserValidator = [
     .withMessage("Invalid user ids"),
 ];
 
-export { createGroupValidator, editGroupValidator, inviteUserValidator };
+const respondInviteValidator = [
+  body("inviteId")
+    .notEmpty()
+    .withMessage("Invite id is required")
+    .isMongoId()
+    .withMessage("Invalid invite id"),
+  body("accept")
+    .notEmpty()
+    .withMessage("Accept is required")
+    .isBoolean()
+    .withMessage("Decisions must be true or false"),
+];
+
+export {
+  createGroupValidator,
+  editGroupValidator,
+  inviteUserValidator,
+  respondInviteValidator,
+};
