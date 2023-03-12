@@ -70,4 +70,36 @@ async function editUserController(
   });
 }
 
-export { userDataController, editUserController };
+async function searchUserController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const query: string = req.query.query as string;
+
+  if (query.length < 2) {
+    res.json([]);
+    return;
+  }
+
+  // Fetches the users
+  const users = await db.user.findMany({
+    where: {
+      userId: {
+        startsWith: query,
+      },
+    },
+  });
+
+  const response = users.map((user) => {
+    return {
+      id: user.id,
+      userId: user.userId,
+      name: user.name,
+    };
+  });
+
+  res.json(response);
+}
+
+export { userDataController, editUserController, searchUserController };
