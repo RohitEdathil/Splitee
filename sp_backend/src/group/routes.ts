@@ -12,7 +12,7 @@ router.post(
   createGroupController
 );
 
-router.post(
+router.put(
   "/:id",
   editGroupValidator,
   validationMiddleware,

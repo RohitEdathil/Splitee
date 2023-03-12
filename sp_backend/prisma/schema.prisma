@@ -16,10 +16,10 @@ model Group {
   usersIds String[] @db.ObjectId
   users    User[]   @relation(fields: [usersIds], references: [id])
   bills    Bill[]
-  requests JoinRequest[] 
+  invites Invite[] 
 }
 
-model JoinRequest {
+model Invite {
   id        String @id @default(auto()) @map("_id") @db.ObjectId
   groupId   String @db.ObjectId
   group     Group  @relation(fields: [groupId], references: [id])
@@ -40,8 +40,8 @@ model User {
   groups   Group[]  @relation(fields: [groupIds], references: [id])
   bills    Bill[]
   owes     Owe[]
-  receivedRequests JoinRequest[] @relation("received")
-  sentRequests JoinRequest[] @relation("sent")
+  receivedInvites Invite[] @relation("received")
+  sentInvites Invite[] @relation("sent")
 }
 
 model Bill {
