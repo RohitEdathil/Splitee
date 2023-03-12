@@ -17,9 +17,7 @@ function errorMiddleware(
     });
   } else if (err instanceof UnauthorizedError) {
     res.status(401).send({
-      error: {
-        message: err.message,
-      },
+      error: err.message,
     });
   } else {
     console.log(err);
