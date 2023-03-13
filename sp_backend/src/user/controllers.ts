@@ -16,6 +16,8 @@ async function userDataController(
     },
     include: {
       groups: req.userId === id,
+      bills: req.userId === id,
+      owes: req.userId === id,
     },
   });
 
@@ -35,6 +37,8 @@ async function userDataController(
   if (req.userId === id) {
     response["email"] = user.email;
     response["groups"] = user.groups;
+    response["bills"] = user.bills;
+    response["owes"] = user.owes;
   }
 
   res.json(response);
