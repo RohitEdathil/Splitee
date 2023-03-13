@@ -1,7 +1,15 @@
 import { Router } from "express";
 import { validationMiddleware } from "../error/middlewares";
-import { createGroupController, editGroupController } from "./controllers";
-import { createGroupValidator, editGroupValidator } from "./validators";
+import {
+  createGroupController,
+  editGroupController,
+  joinGroupController,
+} from "./controllers";
+import {
+  createGroupValidator,
+  editGroupValidator,
+  joinGroupValidator,
+} from "./validators";
 
 const router = Router();
 
@@ -17,6 +25,13 @@ router.put(
   editGroupValidator,
   validationMiddleware,
   editGroupController
+);
+
+router.post(
+  "/join",
+  joinGroupValidator,
+  validationMiddleware,
+  joinGroupController
 );
 
 export default router;

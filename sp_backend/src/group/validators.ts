@@ -19,4 +19,12 @@ const editGroupValidator = [
     .withMessage("Invalid id"),
 ];
 
-export { createGroupValidator, editGroupValidator };
+const joinGroupValidator = [
+  body("groupId")
+    .notEmpty()
+    .withMessage("Group id is required")
+    .isMongoId()
+    .withMessage("Invalid group id"),
+];
+
+export { createGroupValidator, editGroupValidator, joinGroupValidator };

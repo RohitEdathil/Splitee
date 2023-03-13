@@ -82,4 +82,56 @@ async function editGroupController(
   res.status(200).json({ message: "Group edited" });
 }
 
-export { createGroupController, editGroupController };
+async function joinGroupController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const groupId: string = req.body.groupId;
+
+  // Fetch user
+  const user = await db.user.findFirst({
+    where: {
+      userId: req.userId,
+    },
+  });
+
+  // Fetch group
+  const group = await db.group.findFirst({
+    where: {
+      id: groupId,
+    },
+  });
+
+  console.log(group);
+
+  // Check if group exists
+  if (!group) {
+    next(new BadRequestError("Group does not exist"));
+    return;
+  }
+
+  // Check if user is in group
+  if (group.usersIds.includes(user.id)) {
+    next(new BadRequestError("User is already in group"));
+    return;
+  }
+
+  // Add user to group
+  await db.group.update({
+    where: {
+      id: group.id,
+    },
+    data: {
+      users: {
+        connect: {
+          id: user.id,
+        },
+      },
+    },
+  });
+
+  res.status(200).json({ message: "Joined in group" });
+}
+
+export { createGroupController, editGroupController, joinGroupController };
