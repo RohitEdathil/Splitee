@@ -16,4 +16,12 @@ const createBillValidator = [
   body("owes.*").isInt({ min: 0 }).withMessage("Owes must be a number"),
 ];
 
-export { createBillValidator };
+const deleteBillValidator = [
+  body("billId")
+    .notEmpty()
+    .withMessage("Bill id is required")
+    .isMongoId()
+    .withMessage("Invalid bill id"),
+];
+
+export { createBillValidator, deleteBillValidator };

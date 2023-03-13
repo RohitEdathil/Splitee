@@ -110,4 +110,56 @@ async function createBillController(
   });
 }
 
-export { createBillController };
+async function deleteBillController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const billId: string = req.body.billId;
+
+  // Fetch user
+  const user = await db.user.findFirst({
+    where: {
+      userId: req.userId,
+    },
+  });
+
+  // Find the bill
+  const bill = await db.bill.findFirst({
+    where: {
+      id: billId,
+    },
+  });
+
+  // Check if bill exists
+  if (!bill) {
+    next(new BadRequestError("Bill does not exist"));
+    return;
+  }
+
+  // Check if user is in group
+  if (!(bill.creditorId === user.id)) {
+    next(new BadRequestError("User is not the creditor"));
+    return;
+  }
+
+  // Delete all owes
+  await db.owe.deleteMany({
+    where: {
+      billId: billId,
+    },
+  });
+
+  // Delete bill
+  await db.bill.delete({
+    where: {
+      id: billId,
+    },
+  });
+
+  res.status(200).json({
+    message: "Bill deleted successfully",
+  });
+}
+
+export { createBillController, deleteBillController };

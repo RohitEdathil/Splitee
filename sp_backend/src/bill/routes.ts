@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { validationMiddleware } from "../error/middlewares";
-import { createBillController } from "./controllers";
-import { createBillValidator } from "./validators";
+import { createBillController, deleteBillController } from "./controllers";
+import { createBillValidator, deleteBillValidator } from "./validators";
 
 const router = Router();
 
@@ -10,6 +10,13 @@ router.post(
   createBillValidator,
   validationMiddleware,
   createBillController
+);
+
+router.delete(
+  "/delete",
+  deleteBillValidator,
+  validationMiddleware,
+  deleteBillController
 );
 
 export default router;
