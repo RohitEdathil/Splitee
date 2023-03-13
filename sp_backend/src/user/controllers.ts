@@ -14,6 +14,9 @@ async function userDataController(
     where: {
       userId: id,
     },
+    include: {
+      groups: req.userId === id,
+    },
   });
 
   // Ensures the user exists
@@ -31,7 +34,7 @@ async function userDataController(
   // Only returns the email and groups if the user is requesting their own data
   if (req.userId === id) {
     response["email"] = user.email;
-    response["groups"] = user.groupIds;
+    response["groups"] = user.groups;
   }
 
   res.json(response);

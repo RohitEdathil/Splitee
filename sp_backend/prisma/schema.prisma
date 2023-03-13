@@ -16,19 +16,9 @@ model Group {
   usersIds String[] @db.ObjectId
   users    User[]   @relation(fields: [usersIds], references: [id])
   bills    Bill[]
-  invites Invite[] 
+  
 }
 
-model Invite {
-  id        String @id @default(auto()) @map("_id") @db.ObjectId
-  groupId   String @db.ObjectId
-  group     Group  @relation(fields: [groupId], references: [id])
-  userId    String @db.ObjectId
-  user      User   @relation("received",fields: [userId], references: [id])
-  byUserId  String @db.ObjectId
-  byUser    User   @relation("sent",fields: [byUserId], references: [id])
-  status    Status
-}
 
 model User {
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -40,8 +30,7 @@ model User {
   groups   Group[]  @relation(fields: [groupIds], references: [id])
   bills    Bill[]
   owes     Owe[]
-  receivedInvites Invite[] @relation("received")
-  sentInvites Invite[] @relation("sent")
+
 }
 
 model Bill {
