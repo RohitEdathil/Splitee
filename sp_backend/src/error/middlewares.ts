@@ -11,9 +11,7 @@ function errorMiddleware(
 ) {
   if (err instanceof BadRequestError) {
     res.status(400).send({
-      error: {
-        message: err.message,
-      },
+      error: err.message,
     });
   } else if (err instanceof UnauthorizedError) {
     res.status(401).send({
@@ -22,9 +20,7 @@ function errorMiddleware(
   } else {
     console.log(err);
     res.status(500).send({
-      error: {
-        message: "Something went wrong",
-      },
+      error: "Something went wrong",
     });
   }
 }
