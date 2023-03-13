@@ -3,16 +3,25 @@ import { validationMiddleware } from "../error/middlewares";
 import {
   createGroupController,
   editGroupController,
+  getGroupDataController,
   joinGroupController,
   leaveGroupController,
 } from "./controllers";
 import {
   createGroupValidator,
   editGroupValidator,
+  getGroupDataValidator,
   joinGroupValidator,
 } from "./validators";
 
 const router = Router();
+
+router.get(
+  "/:id",
+  getGroupDataValidator,
+  validationMiddleware,
+  getGroupDataController
+);
 
 router.post(
   "/create",

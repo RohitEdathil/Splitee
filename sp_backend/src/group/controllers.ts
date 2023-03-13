@@ -139,9 +139,53 @@ async function leaveGroupController(
   res.status(200).json({ message: "Left group" });
 }
 
+async function getGroupDataController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const groupId = req.params.id;
+
+  // Fetch group
+  const group = await db.group.findUnique({
+    where: {
+      id: groupId,
+    },
+    include: {
+      users: {
+        select: {
+          id: true,
+          userId: true,
+          name: true,
+        },
+      },
+      bills: {
+        include: {
+          owes: true,
+        },
+      },
+    },
+  });
+
+  // Check if group exists
+  if (!group) {
+    next(new BadRequestError("Group does not exist"));
+    return;
+  }
+
+  // Check if user is in group
+  if (!userInGroup(group, req.uid)) {
+    next(new BadRequestError("User is not in group"));
+    return;
+  }
+
+  res.status(200).json(group);
+}
+
 export {
   createGroupController,
   editGroupController,
   joinGroupController,
   leaveGroupController,
+  getGroupDataController,
 };
