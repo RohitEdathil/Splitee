@@ -87,7 +87,7 @@ async function createBillController(
         createMany: {
           data: Array.from(owes.entries()).map(([userId, amount]) => ({
             amount,
-            status: "PENDING",
+            status: userId === req.uid ? "PAID" : "PENDING",
             debtorId: userId,
           })),
         },
