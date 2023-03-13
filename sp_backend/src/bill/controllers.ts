@@ -13,13 +13,6 @@ async function createBillController(
 
   const owes: Map<string, number> = new Map(Object.entries(req.body.owes));
 
-  // Fetch user
-  const user = await db.user.findFirst({
-    where: {
-      userId: req.userId,
-    },
-  });
-
   if (groupId) {
     // Find the group
     const group = await db.group.findFirst({
@@ -35,7 +28,7 @@ async function createBillController(
     }
 
     // Check if user is in group
-    if (!group.usersIds.includes(user.id)) {
+    if (!group.usersIds.includes(req.uid)) {
       next(new BadRequestError("User is not in group"));
       return;
     }
@@ -89,7 +82,7 @@ async function createBillController(
 
       creditor: {
         connect: {
-          id: user.id,
+          id: req.uid,
         },
       },
       owes: {
@@ -116,13 +109,6 @@ async function deleteBillController(
 ) {
   const billId: string = req.body.billId;
 
-  // Fetch user
-  const user = await db.user.findFirst({
-    where: {
-      userId: req.userId,
-    },
-  });
-
   // Find the bill
   const bill = await db.bill.findFirst({
     where: {
@@ -137,7 +123,7 @@ async function deleteBillController(
   }
 
   // Check if user is in group
-  if (!(bill.creditorId === user.id)) {
+  if (!(bill.creditorId === req.uid)) {
     next(new BadRequestError("User is not the creditor"));
     return;
   }
@@ -173,13 +159,6 @@ async function editBillController(
     ? new Map(Object.entries(req.body.owes))
     : null;
 
-  // Fetch user
-  const user = await db.user.findFirst({
-    where: {
-      userId: req.userId,
-    },
-  });
-
   // Find the bill
   const bill = await db.bill.findFirst({
     where: {
@@ -194,7 +173,7 @@ async function editBillController(
   }
 
   // Check if user is the creditor
-  if (!(bill.creditorId === user.id)) {
+  if (!(bill.creditorId === req.uid)) {
     next(new BadRequestError("User is not the creditor"));
     return;
   }

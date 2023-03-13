@@ -27,7 +27,7 @@ async function signUpController(
   }
 
   // Create the user
-  await db.user.create({
+  const newUser = await db.user.create({
     data: {
       userId: userId,
       name: name,
@@ -37,9 +37,13 @@ async function signUpController(
   });
 
   // Generate the JWT token
-  const token = sign({ userId: userId }, process.env.JWT_SECRET, {
-    expiresIn: "30d",
-  });
+  const token = sign(
+    { userId: userId, uid: newUser.id },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "30d",
+    }
+  );
 
   res.json({ token: token });
 }
@@ -73,7 +77,7 @@ async function signInController(
   }
 
   // Generate the JWT token
-  const token = sign({ userId: userId }, process.env.JWT_SECRET, {
+  const token = sign({ userId: userId, uid: user.id }, process.env.JWT_SECRET, {
     expiresIn: "30d",
   });
 

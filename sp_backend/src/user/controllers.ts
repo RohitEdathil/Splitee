@@ -34,7 +34,7 @@ async function userDataController(
   };
 
   // Only returns the email and groups if the user is requesting their own data
-  if (req.userId === id) {
+  if (req.uid === user.id) {
     response["email"] = user.email;
     response["groups"] = user.groups;
     response["bills"] = user.bills;
@@ -65,7 +65,7 @@ async function editUserController(
   }
 
   // Updates the user
-  const user = await db.user.update({
+  await db.user.update({
     where: {
       userId: id,
     },

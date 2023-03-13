@@ -31,8 +31,9 @@ async function ensureLoggedIn(req: Request, res: Response, next: NextFunction) {
     return;
   }
 
-  // Passes the userId to the request object
+  // Passes the userId and uid to the request object
   req.userId = (payload as JwtPayload).userId;
+  req.uid = (payload as JwtPayload).uid;
 
   next();
 }
@@ -42,6 +43,7 @@ declare global {
   namespace Express {
     interface Request {
       userId: string;
+      uid: string;
     }
   }
 }

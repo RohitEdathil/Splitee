@@ -9,22 +9,13 @@ async function createGroupController(
 ) {
   const name: string = req.body.name;
 
-  const userId: string = req.userId;
-
-  // Fetch user
-  const createdBy = await db.user.findFirst({
-    where: {
-      userId: userId,
-    },
-  });
-
   // Create group
   const newGroup = await db.group.create({
     data: {
       name: name,
       users: {
         connect: {
-          id: createdBy.id,
+          id: req.uid,
         },
       },
     },
@@ -41,15 +32,6 @@ async function editGroupController(
   const name: string = req.body.name;
   const id: string = req.params.id;
 
-  const userId: string = req.userId;
-
-  // Fetch user
-  const editedBy = await db.user.findFirst({
-    where: {
-      userId: userId,
-    },
-  });
-
   // Fetch group
   const group = await db.group.findFirst({
     where: {
@@ -64,7 +46,7 @@ async function editGroupController(
   }
 
   // Check if user is in group
-  if (!group.usersIds.includes(editedBy.id)) {
+  if (!group.usersIds.includes(req.uid)) {
     next(new BadRequestError("User is not in group"));
     return;
   }
@@ -89,13 +71,6 @@ async function joinGroupController(
 ) {
   const groupId: string = req.body.groupId;
 
-  // Fetch user
-  const user = await db.user.findFirst({
-    where: {
-      userId: req.userId,
-    },
-  });
-
   // Fetch group
   const group = await db.group.findFirst({
     where: {
@@ -110,7 +85,7 @@ async function joinGroupController(
   }
 
   // Check if user is in group
-  if (group.usersIds.includes(user.id)) {
+  if (group.usersIds.includes(req.uid)) {
     next(new BadRequestError("User is already in group"));
     return;
   }
@@ -123,7 +98,7 @@ async function joinGroupController(
     data: {
       users: {
         connect: {
-          id: user.id,
+          id: req.uid,
         },
       },
     },
@@ -139,13 +114,6 @@ async function leaveGroupController(
 ) {
   const groupId = req.body.groupId;
 
-  // Fetch user
-  const user = await db.user.findFirst({
-    where: {
-      userId: req.userId,
-    },
-  });
-
   // Fetch group
   const group = await db.group.findFirst({
     where: {
@@ -160,7 +128,7 @@ async function leaveGroupController(
   }
 
   // Check if user is in group
-  if (!group.usersIds.includes(user.id)) {
+  if (!group.usersIds.includes(req.uid)) {
     next(new BadRequestError("User is not in group"));
     return;
   }
@@ -173,7 +141,7 @@ async function leaveGroupController(
     data: {
       users: {
         disconnect: {
-          id: user.id,
+          id: req.uid,
         },
       },
     },
