@@ -16,8 +16,20 @@ async function userDataController(
     },
     include: {
       groups: req.userId === id,
-      bills: req.userId === id,
-      owes: req.userId === id,
+      bills: {
+        where: {
+          group: null,
+        },
+      },
+      owes: {
+        where: {
+          bill: { group: null },
+        },
+
+        include: {
+          bill: req.userId === id,
+        },
+      },
     },
   });
 
