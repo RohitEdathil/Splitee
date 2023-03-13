@@ -103,8 +103,6 @@ async function joinGroupController(
     },
   });
 
-  console.log(group);
-
   // Check if group exists
   if (!group) {
     next(new BadRequestError("Group does not exist"));
@@ -134,4 +132,59 @@ async function joinGroupController(
   res.status(200).json({ message: "Joined in group" });
 }
 
-export { createGroupController, editGroupController, joinGroupController };
+async function leaveGroupController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const groupId = req.body.groupId;
+
+  // Fetch user
+  const user = await db.user.findFirst({
+    where: {
+      userId: req.userId,
+    },
+  });
+
+  // Fetch group
+  const group = await db.group.findFirst({
+    where: {
+      id: groupId,
+    },
+  });
+
+  // Check if group exists
+  if (!group) {
+    next(new BadRequestError("Group does not exist"));
+    return;
+  }
+
+  // Check if user is in group
+  if (!group.usersIds.includes(user.id)) {
+    next(new BadRequestError("User is not in group"));
+    return;
+  }
+
+  // Remove user from group
+  await db.group.update({
+    where: {
+      id: group.id,
+    },
+    data: {
+      users: {
+        disconnect: {
+          id: user.id,
+        },
+      },
+    },
+  });
+
+  res.status(200).json({ message: "Left group" });
+}
+
+export {
+  createGroupController,
+  editGroupController,
+  joinGroupController,
+  leaveGroupController,
+};

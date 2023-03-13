@@ -4,6 +4,7 @@ import {
   createGroupController,
   editGroupController,
   joinGroupController,
+  leaveGroupController,
 } from "./controllers";
 import {
   createGroupValidator,
@@ -32,6 +33,13 @@ router.post(
   joinGroupValidator,
   validationMiddleware,
   joinGroupController
+);
+
+router.post(
+  "/leave",
+  joinGroupValidator,
+  validationMiddleware,
+  leaveGroupController
 );
 
 export default router;
