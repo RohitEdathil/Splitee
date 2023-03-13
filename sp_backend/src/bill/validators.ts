@@ -39,4 +39,22 @@ const editBillValidator = [
     .withMessage("Owes must be a number"),
 ];
 
-export { createBillValidator, deleteBillValidator, editBillValidator };
+const changeStatusValidator = [
+  body("oweId")
+    .notEmpty()
+    .withMessage("Owe id is required")
+    .isMongoId()
+    .withMessage("Invalid debt"),
+  body("status")
+    .notEmpty()
+    .withMessage("Status is required")
+    .isIn(["PENDING", "PAID"])
+    .withMessage("Invalid status"),
+];
+
+export {
+  createBillValidator,
+  deleteBillValidator,
+  editBillValidator,
+  changeStatusValidator,
+};

@@ -1,11 +1,13 @@
 import { Router } from "express";
 import { validationMiddleware } from "../error/middlewares";
 import {
+  changeStatusController,
   createBillController,
   deleteBillController,
   editBillController,
 } from "./controllers";
 import {
+  changeStatusValidator,
   createBillValidator,
   deleteBillValidator,
   editBillValidator,
@@ -18,6 +20,13 @@ router.post(
   createBillValidator,
   validationMiddleware,
   createBillController
+);
+
+router.put(
+  "/status",
+  changeStatusValidator,
+  validationMiddleware,
+  changeStatusController
 );
 
 router.put(

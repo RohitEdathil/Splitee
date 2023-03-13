@@ -46,8 +46,6 @@ model Bill {
 
 enum Status {
   PENDING
-  ACCEPTED
-  REJECTED
   PAID
 }
 

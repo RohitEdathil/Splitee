@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { db } from "../db";
 import { BadRequestError } from "../error/types";
 import { getGroupById, userInGroup } from "../group/services";
-import { getBillById } from "./services";
+import { getBillById, getOweById } from "./services";
 
 async function createBillController(
   req: Request,
@@ -252,4 +252,47 @@ async function editBillController(
   });
 }
 
-export { createBillController, deleteBillController, editBillController };
+async function changeStatusController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const oweId: string = req.body.oweId;
+  const status: "PAID" | "PENDING" = req.body.status;
+
+  // Find the owe
+  const owe = await getOweById(oweId);
+
+  // Check if owe exists
+  if (!owe) {
+    next(new BadRequestError("Invalid debt"));
+    return;
+  }
+
+  // Check if user is the creditor
+  if (!(owe.bill.creditorId === req.uid)) {
+    next(new BadRequestError("User is not the creditor"));
+    return;
+  }
+
+  // Change status
+  await db.owe.update({
+    where: {
+      id: oweId,
+    },
+    data: {
+      status,
+    },
+  });
+
+  res.status(200).json({
+    message: "Status changed successfully",
+  });
+}
+
+export {
+  createBillController,
+  deleteBillController,
+  editBillController,
+  changeStatusController,
+};

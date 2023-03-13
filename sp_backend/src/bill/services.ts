@@ -8,4 +8,15 @@ async function getBillById(billId: string) {
   });
 }
 
-export { getBillById };
+async function getOweById(oweId: string) {
+  return await db.owe.findFirst({
+    where: {
+      id: oweId,
+    },
+    include: {
+      bill: true,
+    },
+  });
+}
+
+export { getBillById, getOweById };
