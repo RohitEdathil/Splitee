@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { db } from "../db";
 import { BadRequestError } from "../error/types";
+import { getGroupById, userInGroup } from "../group/services";
+import { getBillById } from "./services";
 
 async function createBillController(
   req: Request,
@@ -15,11 +17,7 @@ async function createBillController(
 
   if (groupId) {
     // Find the group
-    const group = await db.group.findFirst({
-      where: {
-        id: groupId,
-      },
-    });
+    const group = await getGroupById(groupId);
 
     // Check if group exists
     if (!group) {
@@ -28,7 +26,7 @@ async function createBillController(
     }
 
     // Check if user is in group
-    if (!group.usersIds.includes(req.uid)) {
+    if (!userInGroup(group, req.uid)) {
       next(new BadRequestError("User is not in group"));
       return;
     }
@@ -110,11 +108,7 @@ async function deleteBillController(
   const billId: string = req.body.billId;
 
   // Find the bill
-  const bill = await db.bill.findFirst({
-    where: {
-      id: billId,
-    },
-  });
+  const bill = await getBillById(billId);
 
   // Check if bill exists
   if (!bill) {
@@ -160,11 +154,7 @@ async function editBillController(
     : null;
 
   // Find the bill
-  const bill = await db.bill.findFirst({
-    where: {
-      id: billId,
-    },
-  });
+  const bill = await getBillById(billId);
 
   // Check if bill exists
   if (!bill) {

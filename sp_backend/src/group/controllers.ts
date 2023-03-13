@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { db } from "../db";
 import { BadRequestError } from "../error/types";
+import { getGroupById, userInGroup } from "./services";
 
 async function createGroupController(
   req: Request,
@@ -33,11 +34,7 @@ async function editGroupController(
   const id: string = req.params.id;
 
   // Fetch group
-  const group = await db.group.findFirst({
-    where: {
-      id: id,
-    },
-  });
+  const group = await getGroupById(id);
 
   // Check if group exists
   if (!group) {
@@ -46,7 +43,7 @@ async function editGroupController(
   }
 
   // Check if user is in group
-  if (!group.usersIds.includes(req.uid)) {
+  if (!userInGroup(group, req.uid)) {
     next(new BadRequestError("User is not in group"));
     return;
   }
@@ -72,11 +69,7 @@ async function joinGroupController(
   const groupId: string = req.body.groupId;
 
   // Fetch group
-  const group = await db.group.findFirst({
-    where: {
-      id: groupId,
-    },
-  });
+  const group = await getGroupById(groupId);
 
   // Check if group exists
   if (!group) {
@@ -85,7 +78,7 @@ async function joinGroupController(
   }
 
   // Check if user is in group
-  if (group.usersIds.includes(req.uid)) {
+  if (userInGroup(group, req.uid)) {
     next(new BadRequestError("User is already in group"));
     return;
   }
@@ -115,11 +108,7 @@ async function leaveGroupController(
   const groupId = req.body.groupId;
 
   // Fetch group
-  const group = await db.group.findFirst({
-    where: {
-      id: groupId,
-    },
-  });
+  const group = await getGroupById(groupId);
 
   // Check if group exists
   if (!group) {
@@ -128,7 +117,7 @@ async function leaveGroupController(
   }
 
   // Check if user is in group
-  if (!group.usersIds.includes(req.uid)) {
+  if (!userInGroup(group, req.uid)) {
     next(new BadRequestError("User is not in group"));
     return;
   }
