@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 
 const createBillValidator = [
   body("title")
@@ -24,4 +24,19 @@ const deleteBillValidator = [
     .withMessage("Invalid bill id"),
 ];
 
-export { createBillValidator, deleteBillValidator };
+const editBillValidator = [
+  param("billId")
+    .notEmpty()
+    .withMessage("Bill id is required")
+    .isMongoId()
+    .withMessage("Invalid bill id"),
+
+  body("title").optional().isString().withMessage("Title must be a string"),
+  body("amount").optional().isNumeric().withMessage("Amount must be a number"),
+  body("owes.*")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage("Owes must be a number"),
+];
+
+export { createBillValidator, deleteBillValidator, editBillValidator };
