@@ -37,8 +37,8 @@ model Bill {
   id         String @id @default(auto()) @map("_id") @db.ObjectId
   title      String
   amount     Float
-  groupId    String? @db.ObjectId
-  group      Group?  @relation(fields: [groupId], references: [id])
+  groupId    String @db.ObjectId
+  group      Group  @relation(fields: [groupId], references: [id])
   creditorId String @db.ObjectId
   creditor   User   @relation(fields: [creditorId], references: [id])
   owes       Owe[]
