@@ -5,9 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Frontend",
+            "type": "dart",
+            "request": "launch",
+            "cwd": "${workspaceFolder}\\sp_frontend",
+            "flutterMode": "debug",
+            "program": "${workspaceFolder}\\sp_frontend\\lib\\main.dart",
+        },
+        {
             "type": "node-terminal",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "Backend",
             "skipFiles": [
                 "<node_internals>/**"
             ],
