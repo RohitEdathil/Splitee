@@ -48,12 +48,12 @@ class _LoginScreenState extends State<LoginScreen> {
         _errorPopup("Please fill all the fields", context);
         return;
       }
-      _isLoading = true;
+      _toggleLoading();
       auth.login(userId, password).then((error) => {
             if (error != null)
               {
                 _errorPopup(error, context),
-                _isLoading = false,
+                _toggleLoading(),
               }
             else
               {
@@ -71,12 +71,13 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
-      _isLoading = true;
+      _toggleLoading();
+
       auth.signUp(userId, password, name, email).then((error) => {
             if (error != null)
               {
                 _errorPopup(error, context),
-                _isLoading = false,
+                _toggleLoading(),
               }
             else
               {
@@ -95,6 +96,12 @@ class _LoginScreenState extends State<LoginScreen> {
   void _toggleObscure() {
     setState(() {
       _isObscure = !_isObscure;
+    });
+  }
+
+  void _toggleLoading() {
+    setState(() {
+      _isLoading = !_isLoading;
     });
   }
 
@@ -163,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     _isLoading
                         ? const SpinKitPulse(
                             color: Palette.beta,
-                            size: 50.0,
+                            size: 55.0,
                           )
                         : MediumButton(
                             callback: () => _callback(context),
