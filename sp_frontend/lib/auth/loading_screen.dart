@@ -8,11 +8,11 @@ class LoadingScreen extends StatelessWidget {
   const LoadingScreen({super.key});
 
   void _authInitialised(AuthProvider auth, BuildContext context) {
-    if (auth.isAuthenticated) {
-      Navigator.of(context).pushReplacementNamed('/home');
-    } else {
+    if (!auth.isAuthenticated) {
       Navigator.of(context).pushReplacementNamed('/login');
+      return;
     }
+    Navigator.of(context).pushReplacementNamed('/home');
   }
 
   @override

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:provider/provider.dart';
+import 'package:sp_frontend/auth/auth_provider.dart';
 import 'package:sp_frontend/components/custom_input.dart';
 import 'package:sp_frontend/components/medium_button.dart';
 import 'package:sp_frontend/theme/colors.dart';
@@ -18,8 +21,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordCtrlr = TextEditingController();
   final _nameCtrlr = TextEditingController();
   final _emailCtrlr = TextEditingController();
-  bool loginMode = true;
+  bool _loginMode = true;
   bool _isObscure = true;
+  bool _isLoading = false;
 
   void _errorPopup(String message, BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -37,12 +41,25 @@ class _LoginScreenState extends State<LoginScreen> {
     String name = _nameCtrlr.text.trim();
     String email = _emailCtrlr.text.trim();
 
-    if (loginMode) {
+    final auth = context.read<AuthProvider>();
+
+    if (_loginMode) {
       if (userId.isEmpty || password.isEmpty) {
         _errorPopup("Please fill all the fields", context);
         return;
       }
-      // TODO: Login
+      _isLoading = true;
+      auth.login(userId, password).then((error) => {
+            if (error != null)
+              {
+                _errorPopup(error, context),
+                _isLoading = false,
+              }
+            else
+              {
+                Navigator.of(context).pushReplacementNamed('/home'),
+              }
+          });
     } else {
       if (userId.isEmpty || password.isEmpty || name.isEmpty || email.isEmpty) {
         _errorPopup("Please fill all the fields", context);
@@ -53,13 +70,25 @@ class _LoginScreenState extends State<LoginScreen> {
         _errorPopup("Please enter a valid email address", context);
         return;
       }
-      // TODO: Sign Up
+
+      _isLoading = true;
+      auth.signUp(userId, password, name, email).then((error) => {
+            if (error != null)
+              {
+                _errorPopup(error, context),
+                _isLoading = false,
+              }
+            else
+              {
+                Navigator.of(context).pushReplacementNamed('/home'),
+              }
+          });
     }
   }
 
   void _toggleMode(BuildContext context) {
     setState(() {
-      loginMode = !loginMode;
+      _loginMode = !_loginMode;
     });
   }
 
@@ -78,6 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 50),
               Center(
                 child: Transform.scale(
                   scale: 1.3,
@@ -99,12 +129,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 10,
                     ),
                     const Text(
-                      "Split your bill easily",
+                      "Split your bills easily",
                       style: TextStyle(fontSize: 14),
                     ),
                     const SizedBox(height: 40),
                     CustomInput(controller: _userIdCtrlr, hintText: "User ID"),
-                    if (!loginMode) ...[
+                    if (!_loginMode) ...[
                       CustomInput(
                           controller: _nameCtrlr, hintText: "Full Name"),
                       CustomInput(
@@ -130,25 +160,38 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    MediumButton(
-                        callback: () => _callback(context),
-                        text: loginMode ? "Login" : "Sign Up",
-                        color: Palette.alpha,
-                        icon: Icons.login),
+                    _isLoading
+                        ? const SpinKitPulse(
+                            color: Palette.beta,
+                            size: 50.0,
+                          )
+                        : MediumButton(
+                            callback: () => _callback(context),
+                            text: _loginMode ? "Login" : "Sign Up",
+                            color: Palette.alpha,
+                            icon: Icons.login),
                     TextButton(
                       onPressed: () => _toggleMode(context),
                       style: ButtonStyle(
-                          overlayColor: MaterialStateProperty.all(
-                              Palette.alpha.withOpacity(0.2)),
-                          foregroundColor:
-                              MaterialStateProperty.all(Palette.beta)),
-                      child: Text(
-                        loginMode
-                            ? "Sign Up if you are new here"
-                            : "Login if you have an account",
-                        style: const TextStyle(
-                            decoration: TextDecoration.underline,
-                            decorationColor: Palette.beta),
+                        overlayColor: MaterialStateProperty.all(
+                            Palette.alpha.withOpacity(0.2)),
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            _loginMode
+                                ? "Don't have an account? "
+                                : "Already have an account?",
+                            style: const TextStyle(color: Palette.alphaDark),
+                          ),
+                          Text(
+                            _loginMode ? "Sign Up" : "Login",
+                            style: const TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Palette.beta,
+                                decorationColor: Palette.beta),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 50),
