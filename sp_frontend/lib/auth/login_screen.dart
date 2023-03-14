@@ -4,6 +4,8 @@ import 'package:sp_frontend/components/medium_button.dart';
 import 'package:sp_frontend/theme/colors.dart';
 import 'package:lottie/lottie.dart';
 
+final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
@@ -23,18 +25,35 @@ class _LoginScreenState extends State<LoginScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
+        backgroundColor: Palette.beta,
         duration: const Duration(seconds: 2),
       ),
     );
   }
 
   void _callback(BuildContext context) async {
-    String email = _userIdCtrlr.text.trim();
-    String pin = _passwordCtrlr.text;
+    String userId = _userIdCtrlr.text.trim();
+    String password = _passwordCtrlr.text;
+    String name = _nameCtrlr.text.trim();
+    String email = _emailCtrlr.text.trim();
 
-    if (email.isEmpty || pin.isEmpty) {
-      _errorPopup("Please enter your user id and password", context);
-      return;
+    if (loginMode) {
+      if (userId.isEmpty || password.isEmpty) {
+        _errorPopup("Please fill all the fields", context);
+        return;
+      }
+      // TODO: Login
+    } else {
+      if (userId.isEmpty || password.isEmpty || name.isEmpty || email.isEmpty) {
+        _errorPopup("Please fill all the fields", context);
+        return;
+      }
+
+      if (!emailRegex.hasMatch(email)) {
+        _errorPopup("Please enter a valid email address", context);
+        return;
+      }
+      // TODO: Sign Up
     }
   }
 
