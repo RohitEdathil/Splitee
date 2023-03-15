@@ -140,19 +140,31 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(fontSize: 14),
                     ),
                     const SizedBox(height: 40),
-                    CustomInput(controller: _userIdCtrlr, hintText: "User ID"),
+                    CustomInput(
+                      controller: _userIdCtrlr,
+                      hintText: "User ID",
+                      color: Palette.alphaLight,
+                    ),
                     if (!_loginMode) ...[
                       CustomInput(
-                          controller: _nameCtrlr, hintText: "Full Name"),
+                        controller: _nameCtrlr,
+                        hintText: "Full Name",
+                        color: Palette.alphaLight,
+                      ),
                       CustomInput(
-                          controller: _emailCtrlr, hintText: "Email Address"),
+                        controller: _emailCtrlr,
+                        hintText: "Email Address",
+                        color: Palette.alphaLight,
+                      ),
                     ],
                     Stack(
                       children: [
                         CustomInput(
-                            isPassword: _isObscure,
-                            controller: _passwordCtrlr,
-                            hintText: "Password"),
+                          isPassword: _isObscure,
+                          controller: _passwordCtrlr,
+                          hintText: "Password",
+                          color: Palette.alphaLight,
+                        ),
                         Align(
                           alignment: Alignment.centerRight,
                           child: SizedBox(

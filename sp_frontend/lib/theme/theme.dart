@@ -10,4 +10,8 @@ final appTheme = ThemeData(
     displayColor: Palette.alphaDark,
     bodyColor: Palette.alphaDark,
   ),
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Palette.betaLight,
+    foregroundColor: Color.fromARGB(255, 4, 57, 6),
+  ),
 );

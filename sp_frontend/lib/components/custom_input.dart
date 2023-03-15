@@ -4,12 +4,14 @@ import 'package:sp_frontend/theme/colors.dart';
 class CustomInput extends StatelessWidget {
   final bool isPassword;
   final String hintText;
+  final Color color;
   final TextEditingController controller;
   const CustomInput(
       {Key? key,
       this.isPassword = false,
       required this.controller,
-      required this.hintText})
+      required this.hintText,
+      required this.color})
       : super(key: key);
 
   @override
@@ -27,7 +29,7 @@ class CustomInput extends StatelessWidget {
             ),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 20, vertical: 17),
-            fillColor: Palette.alphaLight,
+            fillColor: color,
             filled: true),
       ),
     );

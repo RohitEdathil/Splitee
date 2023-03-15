@@ -30,7 +30,7 @@ class _HomeNavigationState extends State<HomeNavigation> {
       padding: const EdgeInsets.symmetric(horizontal: 50),
       decoration: BoxDecoration(
         color: Palette.alphaLight,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(0)),
         boxShadow: [
           BoxShadow(
             color: Palette.alphaDark.withOpacity(0.1),
