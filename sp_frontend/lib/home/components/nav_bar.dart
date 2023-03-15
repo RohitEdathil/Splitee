@@ -27,7 +27,7 @@ class _HomeNavigationState extends State<HomeNavigation> {
   Widget build(BuildContext context) {
     return Container(
       height: 65,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 50),
       decoration: BoxDecoration(
         color: Palette.alphaLight,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
