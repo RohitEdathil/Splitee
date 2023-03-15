@@ -20,7 +20,7 @@ class LoadingScreen extends StatelessWidget {
       return;
     }
 
-    await user.init(auth.userId!);
+    await user.load(auth.userId!);
     navigator.pushReplacementNamed('/home');
   }
 
