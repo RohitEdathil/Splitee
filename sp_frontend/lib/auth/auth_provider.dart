@@ -4,12 +4,14 @@ import 'package:sp_frontend/util/api_client.dart';
 class AuthProvider {
   late SharedPreferences _prefs;
   String? _token;
+  String? userId;
   bool get isAuthenticated => _token != null;
 
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
 
     _token = _prefs.getString('token');
+    userId = _prefs.getString('userId');
 
     if (_token != null) {
       client.setToken(_token!);
@@ -24,7 +26,9 @@ class AuthProvider {
 
     if (response['token'] != null) {
       _token = response['token'];
+      this.userId = response['userId'];
       _prefs.setString('token', _token!);
+      _prefs.setString('userId', userId);
       client.setToken(_token!);
     }
 
@@ -52,6 +56,8 @@ class AuthProvider {
   void logOut() {
     _token = null;
     _prefs.remove('token');
+    userId = null;
+    _prefs.remove('userId');
     client.setToken('');
   }
 }

@@ -3,22 +3,30 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import 'package:sp_frontend/auth/auth_provider.dart';
 import 'package:sp_frontend/theme/colors.dart';
+import 'package:sp_frontend/user/user_provider.dart';
 
 class LoadingScreen extends StatelessWidget {
   const LoadingScreen({super.key});
 
-  void _authInitialised(AuthProvider auth, BuildContext context) {
+  void _init(BuildContext context) async {
+    final auth = context.read<AuthProvider>();
+    final user = context.read<UserProvider>();
+
+    final navigator = Navigator.of(context);
+
+    await auth.init();
     if (!auth.isAuthenticated) {
-      Navigator.of(context).pushReplacementNamed('/login');
+      navigator.pushReplacementNamed('/login');
       return;
     }
-    Navigator.of(context).pushReplacementNamed('/home');
+
+    await user.init(auth.userId!);
+    navigator.pushReplacementNamed('/home');
   }
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.read<AuthProvider>();
-    auth.init().then((_) => _authInitialised(auth, context));
+    _init(context);
 
     return const Scaffold(
       body: Center(
