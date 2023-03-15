@@ -15,19 +15,47 @@ async function userDataController(
       userId: id,
     },
     include: {
-      groups: req.userId === id,
+      // Fetches the groups the user is in
+      groups: {
+        include: {
+          // Includes basic information about the users in the group
+          users: {
+            select: {
+              id: true,
+              userId: true,
+              name: true,
+            },
+          },
+        },
+      },
+
+      // All the bills the user is the creditor of which are not in a group
       bills: {
         where: {
           group: null,
         },
       },
+
+      // All the bills the user is the debtor of which are not in a group
       owes: {
         where: {
           bill: { group: null },
         },
 
         include: {
-          bill: req.userId === id,
+          // Bill information is included
+          bill: {
+            include: {
+              // Basic information about the creditor is included
+              creditor: {
+                select: {
+                  id: true,
+                  userId: true,
+                  name: true,
+                },
+              },
+            },
+          },
         },
       },
     },
