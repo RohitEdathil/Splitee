@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:sp_frontend/home/components/nav_bar.dart';
 import 'package:sp_frontend/theme/colors.dart';
+import 'package:sp_frontend/home/group_view.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -45,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: PageView(
         controller: controller,
         children: [
-          Container(),
+          GroupView(),
           Container(),
           Container(),
         ],

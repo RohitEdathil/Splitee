@@ -14,6 +14,7 @@ class UserProvider extends ChangeNotifier {
   Future<void> reload() async {
     if (userId != null) {
       await load(userId!);
+      notifyListeners();
     }
   }
 }
