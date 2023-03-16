@@ -62,7 +62,8 @@ class GroupCard extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          Icon(Icons.arrow_forward_ios, color: Palette.betaDark, size: 15),
+          const Icon(Icons.arrow_forward_ios,
+              color: Palette.betaDark, size: 15),
         ],
       ),
     );

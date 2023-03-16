@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sp_frontend/theme/colors.dart';
 
 class CustomInput extends StatelessWidget {
   final bool isPassword;
