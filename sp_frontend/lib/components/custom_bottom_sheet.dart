@@ -21,7 +21,8 @@ class _CustomSheetState extends State<CustomSheet> {
         expand: false,
         builder: (context, controller) => SingleChildScrollView(
               controller: controller,
-              child: Padding(
+              child: AnimatedPadding(
+                duration: const Duration(milliseconds: 300),
                 padding: MediaQuery.of(context).viewInsets,
                 child: Column(
                   children: [
