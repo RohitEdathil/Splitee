@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:sp_frontend/routes.dart';
 
 Route pageTransition(RouteSettings settings,
         Map<String, Widget Function(BuildContext)> routes) =>
     PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          routes[settings.name]!(context),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        if (settings.arguments != null) {
+          return routesWithArgs[settings.name]!(
+              context, settings.arguments as String);
+        }
+
+        return routes[settings.name]!(context);
+      },
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         final tween = Tween(begin: const Offset(0, 1.0), end: Offset.zero)
             .chain(CurveTween(curve: Curves.ease));

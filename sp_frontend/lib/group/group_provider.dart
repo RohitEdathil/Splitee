@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:sp_frontend/group/group_modal.dart';
 import 'package:sp_frontend/util/api_client.dart';
 
 class GroupProvider extends ChangeNotifier {
+  Map<String, Group> groups = {};
+
   Future<void> createGroup(String name) async {
     await client.post("group/create", {
       "name": name,
@@ -14,5 +17,16 @@ class GroupProvider extends ChangeNotifier {
     });
 
     return result['error'];
+  }
+
+  Future<void> fetchGroup(String groupId) async {
+    groups[groupId] = Group.fromJson(await client.get("group/$groupId"));
+    notifyListeners();
+  }
+
+  Group? getGroup(String groupId) {
+    fetchGroup(groupId);
+
+    return groups[groupId];
   }
 }

@@ -30,7 +30,7 @@ class LoadingScreen extends StatelessWidget {
 
     return const Scaffold(
       body: Center(
-          child: SpinKitRotatingCircle(
+          child: SpinKitPulse(
         color: Palette.alpha,
       )),
     );
