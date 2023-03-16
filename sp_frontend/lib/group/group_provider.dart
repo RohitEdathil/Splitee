@@ -7,4 +7,12 @@ class GroupProvider extends ChangeNotifier {
       "name": name,
     });
   }
+
+  Future<String?> joinGroup(String groupId) async {
+    final result = await client.post("group/join", {
+      "groupId": groupId,
+    });
+
+    return result['error'];
+  }
 }

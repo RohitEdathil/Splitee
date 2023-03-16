@@ -42,6 +42,11 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
     Navigator.pop(context);
   }
 
+  void _join(BuildContext context) {
+    Navigator.pop(context);
+    Navigator.pushNamed(context, "/join");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -59,7 +64,7 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
               child: MediumButton(
                 text: "Join",
                 color: Palette.alpha,
-                callback: () {},
+                callback: () => _join(context),
                 icon: Icons.qr_code_scanner,
               ),
             ),

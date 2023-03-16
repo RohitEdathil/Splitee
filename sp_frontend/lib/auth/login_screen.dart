@@ -3,6 +3,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import 'package:sp_frontend/auth/auth_provider.dart';
 import 'package:sp_frontend/components/custom_input.dart';
+import 'package:sp_frontend/components/custom_scackbar.dart';
 import 'package:sp_frontend/components/medium_button.dart';
 import 'package:sp_frontend/theme/colors.dart';
 import 'package:lottie/lottie.dart';
@@ -26,13 +27,8 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   void _errorPopup(String message, BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Palette.beta,
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(customSnackBar(context, message));
   }
 
   void _callback(BuildContext context) async {
