@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:provider/provider.dart';
 import 'package:sp_frontend/components/custom_input.dart';
 import 'package:sp_frontend/components/medium_button.dart';
+import 'package:sp_frontend/group/group_provider.dart';
 import 'package:sp_frontend/theme/colors.dart';
+import 'package:sp_frontend/user/user_provider.dart';
 
 class AddGroupSheet extends StatefulWidget {
   const AddGroupSheet({super.key});
@@ -12,6 +16,32 @@ class AddGroupSheet extends StatefulWidget {
 
 class _AddGroupSheetState extends State<AddGroupSheet> {
   final _nameController = TextEditingController();
+  bool _isCreating = false;
+
+  void _create(BuildContext context) async {
+    final name = _nameController.text;
+
+    if (name.isEmpty) return;
+
+    final group = context.read<GroupProvider>();
+    final user = context.read<UserProvider>();
+
+    setState(() {
+      _isCreating = true;
+    });
+
+    await group.createGroup(name);
+    await user.reload();
+
+    setState(() {
+      _isCreating = false;
+    });
+
+    if (!mounted) return;
+
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -35,11 +65,16 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
             ),
             SizedBox(
               width: (MediaQuery.of(context).size.width - 60) / 2,
-              child: MediumButton(
-                  text: "Create",
-                  color: Palette.alpha,
-                  callback: () {},
-                  icon: Icons.add),
+              child: _isCreating
+                  ? const SpinKitPulse(
+                      color: Palette.alpha,
+                      size: 30.0,
+                    )
+                  : MediumButton(
+                      text: "Create",
+                      color: Palette.alpha,
+                      callback: () => _create(context),
+                      icon: Icons.add),
             ),
           ],
         ),
