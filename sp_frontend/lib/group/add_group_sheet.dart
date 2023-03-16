@@ -37,7 +37,7 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
               width: (MediaQuery.of(context).size.width - 60) / 2,
               child: MediumButton(
                   text: "Create",
-                  color: Palette.beta,
+                  color: Palette.alpha,
                   callback: () {},
                   icon: Icons.add),
             ),

@@ -10,13 +10,17 @@ class CustomSheet extends StatefulWidget {
 }
 
 class _CustomSheetState extends State<CustomSheet> {
+  final scrollController = DraggableScrollableController();
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-        maxChildSize: 1,
+        maxChildSize: 0.5,
+        controller: scrollController,
         initialChildSize: 0.3,
+        snap: true,
         expand: false,
         builder: (context, controller) => SingleChildScrollView(
+              controller: controller,
               child: Padding(
                 padding: MediaQuery.of(context).viewInsets,
                 child: Column(

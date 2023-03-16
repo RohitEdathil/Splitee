@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sp_frontend/components/custom_bottom_sheet.dart';
-import 'package:sp_frontend/group/add_group_screen.dart';
+import 'package:sp_frontend/group/add_group_sheet.dart';
 
 import 'package:sp_frontend/home/components/nav_bar.dart';
 import 'package:sp_frontend/theme/colors.dart';
