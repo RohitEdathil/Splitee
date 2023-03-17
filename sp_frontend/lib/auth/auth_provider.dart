@@ -5,7 +5,7 @@ class AuthProvider {
   late SharedPreferences _prefs;
   String? _token;
   String? userId;
-  bool get isAuthenticated => _token != null;
+  bool get isAuthenticated => _token != null && userId != null;
 
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
