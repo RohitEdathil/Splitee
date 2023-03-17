@@ -30,10 +30,12 @@ class BaseGroup {
 class Group extends BaseGroup {
   final List<Bill> bills;
   final List<Payment> payments = [];
-  final Map<BaseUser, double> balances = {};
+  late final List<MapEntry<BaseUser, double>> sortedBalances;
 
   Group(String name, String id, Map<String, BaseUser> users, this.bills)
       : super(name, id, users) {
+    Map<BaseUser, double> balances = {};
+
     for (final bill in bills) {
       for (final owe in bill.owes) {
         if (owe.status == OweStatus.paid) continue;
@@ -47,6 +49,9 @@ class Group extends BaseGroup {
         payments.add(Payment(owe.debtor, bill.creditor, owe.amount));
       }
     }
+
+    sortedBalances = balances.entries.toList();
+    sortedBalances.sort((a, b) => -a.value.compareTo(b.value));
   }
 
   factory Group.fromJson(Map json) {

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:sp_frontend/theme/colors.dart';
 import 'package:sp_frontend/user/user_modal.dart';
 
