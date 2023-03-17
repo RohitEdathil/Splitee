@@ -18,7 +18,27 @@ class OptionsView extends StatefulWidget {
 
 class _OptionsViewState extends State<OptionsView> {
   bool _changingName = false;
+  bool _leavingGroup = false;
   bool _doneOnce = false;
+
+  void _leaveGroup(BuildContext context) async {
+    final groupProvider = context.read<GroupProvider>();
+    final user = context.read<UserProvider>();
+
+    setState(() {
+      _leavingGroup = true;
+    });
+
+    await groupProvider.leaveGroup(widget.group.id);
+    await user.reload();
+
+    setState(() {
+      _leavingGroup = false;
+    });
+
+    if (!mounted) return;
+    Navigator.of(context).pop();
+  }
 
   void _changeName(BuildContext context) async {
     final groupProvider = context.read<GroupProvider>();
@@ -75,11 +95,16 @@ class _OptionsViewState extends State<OptionsView> {
         onPressed: () {},
         text: "Joining Code",
       ),
-      OptionButton(
-        icon: Icons.logout,
-        onPressed: () {},
-        text: "Leave Group",
-      ),
+      _leavingGroup
+          ? const SpinKitPulse(
+              color: Palette.alpha,
+              size: 48,
+            )
+          : OptionButton(
+              icon: Icons.logout,
+              onPressed: () => _leaveGroup(context),
+              text: "Leave Group",
+            ),
     ]);
   }
 }

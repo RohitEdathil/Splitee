@@ -36,15 +36,16 @@ class Group extends BaseGroup {
       : super(name, id, users) {
     Map<BaseUser, double> balances = {};
 
+    for (final user in users.values) {
+      balances[user] = 0;
+    }
+
     for (final bill in bills) {
       for (final owe in bill.owes) {
         if (owe.status == OweStatus.paid) continue;
 
-        balances.update(owe.debtor, (value) => value - owe.amount,
-            ifAbsent: () => -owe.amount);
-
-        balances.update(bill.creditor, (value) => value + owe.amount,
-            ifAbsent: () => owe.amount);
+        balances[owe.debtor] = balances[owe.debtor]! - owe.amount;
+        balances[bill.creditor] = balances[bill.creditor]! + owe.amount;
 
         payments.add(Payment(owe.debtor, bill.creditor, owe.amount));
       }

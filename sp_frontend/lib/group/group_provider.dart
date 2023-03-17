@@ -35,4 +35,10 @@ class GroupProvider extends ChangeNotifier {
 
     return groups[groupId];
   }
+
+  Future<void> leaveGroup(String groupId) async {
+    await client.post("group/leave", {
+      "groupId": groupId,
+    });
+  }
 }
