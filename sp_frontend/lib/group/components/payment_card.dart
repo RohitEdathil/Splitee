@@ -20,7 +20,7 @@ class PaymentCard extends StatelessWidget {
           Expanded(flex: 2, child: UserDispaly(user: payment.to)),
           Expanded(
               flex: 2,
-              child: Text("₹${payment.amount}",
+              child: Text("₹${payment.amount.toStringAsFixed(2)}",
                   textAlign: TextAlign.center,
                   style: Theme.of(context)
                       .textTheme

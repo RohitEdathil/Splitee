@@ -19,7 +19,10 @@ class BalanceCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           UserDispaly(user: balance.key),
-          Text(balance.value > 0 ? "+${balance.value}" : "${balance.value}",
+          Text(
+              balance.value > 0
+                  ? "+${balance.value.toStringAsFixed(2)}"
+                  : balance.value.toStringAsFixed(2),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                   fontWeight: FontWeight.bold,

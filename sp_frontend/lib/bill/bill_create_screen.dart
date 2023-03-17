@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
+import 'package:sp_frontend/bill/bill_provider.dart';
 import 'package:sp_frontend/bill/components/add_from_group.dart';
 import 'package:sp_frontend/components/custom_input.dart';
+import 'package:sp_frontend/components/custom_scackbar.dart';
+import 'package:sp_frontend/components/medium_button.dart';
 import 'package:sp_frontend/components/user_display.dart';
 import 'package:sp_frontend/group/group_modal.dart';
+import 'package:sp_frontend/group/group_provider.dart';
 import 'package:sp_frontend/theme/colors.dart';
 import 'package:sp_frontend/user/user_modal.dart';
 import 'package:sp_frontend/user/user_provider.dart';
@@ -20,14 +25,36 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
   final _nameController = TextEditingController();
   final _amountController = TextEditingController();
 
+  bool _isLoading = false;
+
   final Map<BaseUser, TextEditingController> _participants = {};
 
   bool _isPercentage = false;
 
   void _setPercentage(bool value) {
+    for (var participant in _participants.entries) {
+      if (value) {
+        participant.value.text = _percentageFromValue(participant.value);
+      } else {
+        participant.value.text = _valueFromPercentage(participant.value);
+      }
+    }
+
     setState(() {
       _isPercentage = value;
     });
+  }
+
+  void _splitEqually() {
+    if (_amountController.text.isEmpty) return;
+
+    final amount = _isPercentage ? 100 : double.parse(_amountController.text);
+    final count = _participants.length;
+
+    for (var participant in _participants.entries) {
+      participant.value.text = (amount / count).toString();
+    }
+    setState(() {});
   }
 
   void _editParticipants(BuildContext context) async {
@@ -44,6 +71,7 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
             AddFromGroup(group: widget.group!, users: currentParticipants));
 
     for (final participant in currentParticipants) {
+      if (_participants.containsKey(participant)) continue;
       _participants[participant] = TextEditingController(text: "0");
     }
 
@@ -51,6 +79,102 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
         (participant, _) => !currentParticipants.contains(participant));
 
     setState(() {});
+  }
+
+  String _valueFromPercentage(TextEditingController controller,
+      {bool round = false}) {
+    if (_amountController.text.isEmpty) return "0.0";
+
+    final perc = double.tryParse(controller.text);
+
+    if (perc == null) {
+      controller.text = "0";
+      return "0";
+    }
+
+    if (round) {
+      return (perc * double.parse(_amountController.text) / 100)
+          .toStringAsFixed(2)
+          .toString();
+    }
+    return (perc * double.parse(_amountController.text) / 100).toString();
+  }
+
+  String _percentageFromValue(TextEditingController controller) {
+    if (_amountController.text.isEmpty) return "0.0";
+
+    final value = double.parse(controller.text);
+
+    return (value * 100 / double.parse(_amountController.text)).toString();
+  }
+
+  void _reCalculate() {
+    setState(() {});
+  }
+
+  double _sum() {
+    double s = 0;
+
+    for (var value in _participants.values) {
+      s += double.tryParse(value.text) ?? 0;
+    }
+
+    return s;
+  }
+
+  bool _isValid() => _isPercentage
+      ? _sum() == 100.0
+      : _sum() == double.tryParse(_amountController.text);
+
+  void _errorPopup(String message, BuildContext context) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(customSnackBar(context, message));
+  }
+
+  void _create(BuildContext context) async {
+    if (!_isValid()) {
+      _errorPopup("Sum doesn't match amount", context);
+      return;
+    }
+
+    if (_amountController.text.isEmpty || _nameController.text.isEmpty) {
+      _errorPopup("Please fill in the required fields", context);
+      return;
+    }
+
+    final group = context.read<GroupProvider>();
+    final bill = context.read<BillProvider>();
+
+    final Map<String, double> owes = {};
+
+    for (var participant in _participants.entries) {
+      owes[participant.key.id] = double.parse(participant.value.text);
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final response = await bill.createGroup(
+        _nameController.text, double.parse(_amountController.text), owes,
+        groupId: widget.group?.id);
+
+    if (response != null) {
+      if (!mounted) return;
+      _errorPopup(response, context);
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    if (widget.group != null) {
+      await group.fetchGroup(widget.group!.id);
+    }
+    setState(() {
+      _isLoading = false;
+    });
+    if (mounted) Navigator.pop(context);
   }
 
   @override
@@ -119,8 +243,8 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
 
                     // Split equally button
                     TextButton(
-                      onPressed: () {},
-                      child: const Text("Split Equally"),
+                      onPressed: _splitEqually,
+                      child: const Text("Split"),
                     )
                   ],
                 ),
@@ -129,13 +253,63 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
                     children: [
                       UserDispaly(user: participant.key),
                       const Spacer(),
+                      if (_isPercentage) ...[
+                        SizedBox(
+                          width: 45,
+                          child: TextField(
+                            controller: participant.value,
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            onChanged: (_) => _reCalculate(),
+                          ),
+                        ),
+                        const Text("%"),
+                        const SizedBox(width: 20)
+                      ],
                       const Text("₹"),
                       SizedBox(
                         width: 70,
-                        child: TextField(controller: participant.value),
+                        child: _isPercentage
+                            ? Text(
+                                _valueFromPercentage(participant.value,
+                                    round: true),
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              )
+                            : TextField(
+                                controller: participant.value,
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                        decimal: true),
+                              ),
                       )
                     ],
-                  )
+                  ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Text(
+                      _isPercentage ? "Total: ${_sum()}%" : "Total: ₹${_sum()}",
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall!
+                          .copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 19,
+                            color: _isValid() ? Palette.alpha : Palette.beta,
+                          ),
+                    ),
+                  ),
+                ),
+                _isLoading
+                    ? const SpinKitPulse(
+                        color: Palette.alpha,
+                      )
+                    : MediumButton(
+                        text: "Create",
+                        color: Palette.alpha,
+                        callback: () => _create(context),
+                        icon: Icons.add)
               ],
             ),
           ),
