@@ -5,8 +5,8 @@ import 'package:sp_frontend/components/nav_bar_item.dart';
 import 'package:sp_frontend/group/views/balances_view.dart';
 import 'package:sp_frontend/group/views/bills_view.dart';
 import 'package:sp_frontend/group/group_provider.dart';
+import 'package:sp_frontend/group/views/options_view.dart';
 import 'package:sp_frontend/group/views/payments_view.dart';
-import 'package:sp_frontend/home/components/nav_bar.dart';
 import 'package:sp_frontend/theme/colors.dart';
 
 class GroupScreen extends StatefulWidget {
@@ -42,8 +42,12 @@ class _GroupScreenState extends State<GroupScreen> {
             ),
             body: Column(
               children: [
-                Text(group.name,
-                    style: Theme.of(context).textTheme.headlineLarge),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(group.name,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineLarge),
+                ),
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 15, horizontal: 60),
@@ -91,10 +95,7 @@ class _GroupScreenState extends State<GroupScreen> {
                       BillsView(group: group),
                       PaymentsView(group: group),
                       BalancesView(group: group),
-                      Container(
-                        height: 500,
-                        color: Colors.yellow,
-                      ),
+                      OptionsView(group: group),
                     ],
                   ),
                 )

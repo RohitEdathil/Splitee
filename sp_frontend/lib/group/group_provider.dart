@@ -24,6 +24,12 @@ class GroupProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> changeName(String groupId, String newName) async {
+    await client.put("group/$groupId", {
+      "name": newName,
+    });
+  }
+
   Group? getGroup(String groupId) {
     fetchGroup(groupId);
 
