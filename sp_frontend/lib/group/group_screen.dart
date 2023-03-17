@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import 'package:sp_frontend/components/nav_bar_item.dart';
-import 'package:sp_frontend/group/bills_view.dart';
+import 'package:sp_frontend/group/views/bills_view.dart';
 import 'package:sp_frontend/group/group_provider.dart';
+import 'package:sp_frontend/group/views/payments_view.dart';
 import 'package:sp_frontend/home/components/nav_bar.dart';
 import 'package:sp_frontend/theme/colors.dart';
 
@@ -87,10 +88,7 @@ class _GroupScreenState extends State<GroupScreen> {
                     },
                     children: [
                       BillsView(group: group),
-                      Container(
-                        height: 500,
-                        color: Colors.blue,
-                      ),
+                      PaymentsView(group: group),
                       Container(
                         height: 500,
                         color: Colors.green,

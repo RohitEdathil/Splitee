@@ -29,9 +29,25 @@ class BaseGroup {
 
 class Group extends BaseGroup {
   final List<Bill> bills;
+  final List<Payment> payments = [];
+  final Map<BaseUser, double> balances = {};
 
   Group(String name, String id, Map<String, BaseUser> users, this.bills)
-      : super(name, id, users);
+      : super(name, id, users) {
+    for (final bill in bills) {
+      for (final owe in bill.owes) {
+        if (owe.status == OweStatus.paid) continue;
+
+        balances.update(owe.debtor, (value) => value - owe.amount,
+            ifAbsent: () => -owe.amount);
+
+        balances.update(bill.creditor, (value) => value + owe.amount,
+            ifAbsent: () => owe.amount);
+
+        payments.add(Payment(owe.debtor, bill.creditor, owe.amount));
+      }
+    }
+  }
 
   factory Group.fromJson(Map json) {
     final BaseGroup baseGroup = BaseGroup.fromJson(json);
@@ -49,4 +65,12 @@ class Group extends BaseGroup {
       bills,
     );
   }
+}
+
+class Payment {
+  final BaseUser from;
+  final BaseUser to;
+  final double amount;
+
+  Payment(this.from, this.to, this.amount);
 }
