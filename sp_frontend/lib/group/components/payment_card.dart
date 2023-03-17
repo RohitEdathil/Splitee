@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sp_frontend/components/user_display.dart';
 import 'package:sp_frontend/group/group_modal.dart';
-import 'package:sp_frontend/theme/colors.dart';
 
 class PaymentCard extends StatelessWidget {
   final Payment payment;

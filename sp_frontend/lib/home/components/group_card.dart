@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:sp_frontend/group/group_modal.dart';
 import 'package:sp_frontend/theme/colors.dart';
 

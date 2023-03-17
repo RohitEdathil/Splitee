@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
               }
             else
               {
-                Navigator.of(context).pushReplacementNamed('/home'),
+                Navigator.of(context).pushReplacementNamed('/'),
               }
           });
     } else {

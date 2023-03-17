@@ -5,6 +5,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:sp_frontend/components/custom_input.dart';
+import 'package:sp_frontend/components/option_button.dart';
+import 'package:sp_frontend/components/white_padded_container.dart';
 import 'package:sp_frontend/group/components/view_common.dart';
 import 'package:sp_frontend/group/group_modal.dart';
 import 'package:sp_frontend/group/group_provider.dart';
@@ -127,43 +129,5 @@ class _OptionsViewState extends State<OptionsView> {
               text: "Leave Group",
             ),
     ]);
-  }
-}
-
-class OptionButton extends StatelessWidget {
-  final String text;
-  final IconData icon;
-  final VoidCallback onPressed;
-  const OptionButton({
-    super.key,
-    required this.text,
-    required this.icon,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return WhitePaddedContainer(
-        child: TextButton.icon(
-            onPressed: onPressed, icon: Icon(icon), label: Text(text)));
-  }
-}
-
-class WhitePaddedContainer extends StatelessWidget {
-  final Widget child;
-  const WhitePaddedContainer({super.key, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: child,
-    );
   }
 }

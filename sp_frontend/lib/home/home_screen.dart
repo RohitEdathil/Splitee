@@ -3,8 +3,9 @@ import 'package:sp_frontend/components/custom_bottom_sheet.dart';
 import 'package:sp_frontend/group/add_group_sheet.dart';
 
 import 'package:sp_frontend/home/components/nav_bar.dart';
+import 'package:sp_frontend/home/views/settings_view.dart';
 import 'package:sp_frontend/theme/colors.dart';
-import 'package:sp_frontend/home/group_view.dart';
+import 'package:sp_frontend/home/views/group_view.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -77,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           const GroupView(),
           Container(),
-          Container(),
+          const SettingsView(),
         ],
       ),
       bottomNavigationBar: HomeNavigation(

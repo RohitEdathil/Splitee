@@ -17,4 +17,12 @@ class UserProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> changeName(String newName) async {
+    await client.put("user", {"name": newName});
+  }
+
+  Future<void> changeEmail(String newEmail) async {
+    await client.put("user", {"email": newEmail});
+  }
 }

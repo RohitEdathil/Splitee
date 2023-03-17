@@ -12,15 +12,18 @@ Route pageTransition(RouteSettings settings,
 
         return routes[settings.name]!(context);
       },
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        final tween = Tween(begin: const Offset(0, 1.0), end: Offset.zero)
-            .chain(CurveTween(curve: Curves.ease));
-        return FadeTransition(
-          opacity: animation,
-          child: SlideTransition(
-            position: animation.drive(tween),
-            child: child,
-          ),
-        );
-      },
+      transitionsBuilder: transitionMaker,
     );
+
+Widget transitionMaker(BuildContext context, Animation<double> animation,
+    Animation<double> secondaryAnimation, Widget child) {
+  final tween = Tween(begin: const Offset(0, 1.0), end: Offset.zero)
+      .chain(CurveTween(curve: Curves.ease));
+  return FadeTransition(
+    opacity: animation,
+    child: SlideTransition(
+      position: animation.drive(tween),
+      child: child,
+    ),
+  );
+}

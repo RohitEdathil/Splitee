@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
+import 'package:sp_frontend/bill/bill_create_screen.dart';
 import 'package:sp_frontend/components/nav_bar_item.dart';
 import 'package:sp_frontend/group/views/balances_view.dart';
 import 'package:sp_frontend/group/views/bills_view.dart';
@@ -8,6 +9,7 @@ import 'package:sp_frontend/group/group_provider.dart';
 import 'package:sp_frontend/group/views/options_view.dart';
 import 'package:sp_frontend/group/views/payments_view.dart';
 import 'package:sp_frontend/theme/colors.dart';
+import 'package:sp_frontend/theme/page_transition.dart';
 
 class GroupScreen extends StatefulWidget {
   final String groupId;
@@ -22,6 +24,31 @@ class _GroupScreenState extends State<GroupScreen> {
 
   final PageController controller = PageController();
   int curPos = 0;
+
+  Widget? _getFloatingActionButton() {
+    if (curPos >= 2) return null;
+
+    return Builder(builder: (context) {
+      return FloatingActionButton(
+        backgroundColor: Palette.alpha,
+        foregroundColor: Palette.alphaLight,
+        onPressed: () =>
+            curPos == 1 ? _magicSummarize(context) : _billAdd(context),
+        child: Icon(curPos == 0
+            ? Icons.add_shopping_cart
+            : Icons.auto_fix_high_rounded),
+      );
+    });
+  }
+
+  void _billAdd(BuildContext context) {
+    final group = context.read<GroupProvider>().getGroup(widget.groupId);
+    Navigator.of(context).push(PageRouteBuilder(
+        transitionsBuilder: transitionMaker,
+        pageBuilder: (_, __, ___) => BillCreateScreen(group: group)));
+  }
+
+  void _magicSummarize(BuildContext context) {}
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +67,7 @@ class _GroupScreenState extends State<GroupScreen> {
               foregroundColor: Palette.alpha,
               scrolledUnderElevation: 0,
             ),
+            floatingActionButton: _getFloatingActionButton(),
             body: Column(
               children: [
                 Padding(
