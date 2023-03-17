@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:sp_frontend/components/custom_input.dart';
 import 'package:sp_frontend/group/components/view_common.dart';
 import 'package:sp_frontend/group/group_modal.dart';
@@ -20,6 +23,8 @@ class _OptionsViewState extends State<OptionsView> {
   bool _changingName = false;
   bool _leavingGroup = false;
   bool _doneOnce = false;
+
+  late QrImage _qrImage;
 
   void _leaveGroup(BuildContext context) async {
     final groupProvider = context.read<GroupProvider>();
@@ -63,11 +68,24 @@ class _OptionsViewState extends State<OptionsView> {
     });
   }
 
+  String _generateData() {
+    return jsonEncode({
+      "id": widget.group.id,
+      "name": widget.group.name,
+    });
+  }
+
   final TextEditingController controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     if (!_doneOnce) {
       controller.text = widget.group.name;
+      _qrImage = QrImage(
+        data: _generateData(),
+        version: QrVersions.auto,
+        size: 200,
+        foregroundColor: Palette.alpha,
+      );
       _doneOnce = true;
     }
 
@@ -90,11 +108,14 @@ class _OptionsViewState extends State<OptionsView> {
                 )
         ],
       )),
-      OptionButton(
-        icon: Icons.qr_code_2,
-        onPressed: () {},
-        text: "Joining Code",
-      ),
+      WhitePaddedContainer(
+          child: Column(children: [
+        const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Text("Scan to join"),
+        ),
+        _qrImage,
+      ])),
       _leavingGroup
           ? const SpinKitPulse(
               color: Palette.alpha,
