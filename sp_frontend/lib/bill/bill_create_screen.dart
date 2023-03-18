@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
+import 'package:sp_frontend/bill/bill_modal.dart';
 import 'package:sp_frontend/bill/bill_provider.dart';
 import 'package:sp_frontend/bill/components/add_from_group.dart';
 import 'package:sp_frontend/components/custom_input.dart';
@@ -16,7 +17,8 @@ import 'package:sp_frontend/user/user_provider.dart';
 
 class BillCreateScreen extends StatefulWidget {
   final Group? group;
-  const BillCreateScreen({super.key, this.group});
+  final Bill? bill;
+  const BillCreateScreen({super.key, this.group, this.bill});
 
   @override
   State<BillCreateScreen> createState() => _BillCreateScreenState();
@@ -31,6 +33,22 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
   final Map<BaseUser, TextEditingController> _participants = {};
 
   bool _isPercentage = false;
+
+  bool get _isEditing => widget.bill != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_isEditing) return;
+
+    _nameController.text = widget.bill!.title;
+    _amountController.text = widget.bill!.amount.toString();
+
+    for (var owe in widget.bill!.owes) {
+      _participants[owe.debtor] =
+          TextEditingController(text: owe.amount.toString());
+    }
+  }
 
   void _setPercentage(bool value) {
     for (var participant in _participants.entries) {
@@ -128,14 +146,15 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
 
   bool _isValid() => _isPercentage
       ? _sum() == 100.0
-      : _sum() == double.tryParse(_amountController.text);
+      : _sum().toStringAsFixed(2) ==
+          double.tryParse(_amountController.text)?.toStringAsFixed(2);
 
   void _errorPopup(String message, BuildContext context) {
     ScaffoldMessenger.of(context)
         .showSnackBar(customSnackBar(context, message));
   }
 
-  void _create(BuildContext context) async {
+  void _createOrSave(BuildContext context) async {
     if (!_isValid()) {
       _errorPopup("Sum doesn't match amount", context);
       return;
@@ -159,9 +178,12 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
       _isLoading = true;
     });
 
-    final response = await bill.createBill(_nameController.text,
-        double.tryParse(_amountController.text) ?? 0, owes,
-        groupId: widget.group?.id);
+    final response = _isEditing
+        ? (await bill.editBill(widget.bill!.id, _nameController.text,
+            double.tryParse(_amountController.text) ?? 0, owes))
+        : (await bill.createBill(_nameController.text,
+            double.tryParse(_amountController.text) ?? 0, owes,
+            groupId: widget.group?.id));
 
     if (response != null) {
       if (!mounted) return;
@@ -186,13 +208,14 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
     final user = context.read<UserProvider>();
     final currentUser = user.currentUser;
 
-    if (!_participants.containsKey(currentUser)) {
+    if (!_participants.containsKey(currentUser) && !_isEditing) {
       _participants[currentUser!] = TextEditingController(text: "0");
     }
 
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Create Bill'),
+          title:
+              _isEditing ? const Text('Edit Bill') : const Text('Create Bill'),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -305,8 +328,8 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 20),
                         child: Text(
                           _isPercentage
-                              ? "Total: ${_sum()}%"
-                              : "Total: ₹${_sum()}",
+                              ? "Total: ${_sum().toStringAsFixed(2)}%"
+                              : "Total: ₹${_sum().toStringAsFixed(2)}",
                           style: Theme.of(context)
                               .textTheme
                               .headlineSmall!
@@ -329,10 +352,11 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
                         color: Palette.alpha,
                       )
                     : MediumButton(
-                        text: "Create",
+                        text: _isEditing ? "Save" : "Create",
                         color: Palette.alpha,
-                        callback: () => _create(context),
-                        icon: Icons.add)
+                        callback: () => _createOrSave(context),
+                        icon: _isEditing ? Icons.save : Icons.add,
+                      )
               ],
             ),
           ),

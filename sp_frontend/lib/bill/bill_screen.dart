@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
+import 'package:sp_frontend/bill/bill_create_screen.dart';
 import 'package:sp_frontend/bill/bill_modal.dart';
 import 'package:sp_frontend/bill/bill_provider.dart';
 import 'package:sp_frontend/components/medium_button.dart';
@@ -9,6 +10,7 @@ import 'package:sp_frontend/components/white_padded_container.dart';
 import 'package:sp_frontend/group/group_modal.dart';
 import 'package:sp_frontend/group/group_provider.dart';
 import 'package:sp_frontend/theme/colors.dart';
+import 'package:sp_frontend/theme/page_transition.dart';
 import 'package:sp_frontend/user/user_provider.dart';
 
 class BillScreen extends StatefulWidget {
@@ -21,24 +23,55 @@ class BillScreen extends StatefulWidget {
 }
 
 class _BillScreenState extends State<BillScreen> {
-  final Map<Owe, bool> _isChanging = {};
+  final Map<String, bool> _isChanging = {};
   bool _isDeleting = false;
+  late Bill bill;
+  Group? group;
 
   bool _userIsCreditor(BuildContext context, Bill bill) =>
       context.read<UserProvider>().currentUser!.id == bill.creditor.id;
 
   Future<void> _changeStatus(bool value, Owe owe, BuildContext context) async {
     final billProvider = context.read<BillProvider>();
+    final groupProvider = context.read<GroupProvider>();
 
     setState(() {
-      _isChanging[owe] = true;
+      _isChanging[owe.id] = true;
     });
     await billProvider.changeStatus(owe.id, value);
 
-    owe.status = value ? OweStatus.paid : OweStatus.pending;
+    if (group != null) {
+      await groupProvider.fetchGroup(group!.id);
+      group = groupProvider.getGroup(group!.id);
+    } else {
+      await context.read<UserProvider>().reload();
+    }
 
     setState(() {
-      _isChanging[owe] = false;
+      _isChanging[owe.id] = false;
+    });
+  }
+
+  void _goToEditScreen(BuildContext context) async {
+    await Navigator.of(context).push(PageRouteBuilder(
+        transitionsBuilder: transitionMaker,
+        pageBuilder: (_, __, ___) => BillCreateScreen(
+              group: group,
+              bill: group?.getBill(widget.billId),
+            )));
+    setState(() {
+      if (group != null) {
+        if (mounted) {
+          group = context.read<GroupProvider>().getGroup(group!.id);
+          bill = group!.getBill(widget.billId);
+        }
+      }
+
+      _isChanging.clear();
+
+      for (var owe in bill.owes) {
+        _isChanging[owe.id] = false;
+      }
     });
   }
 
@@ -53,8 +86,8 @@ class _BillScreenState extends State<BillScreen> {
 
     await billProvider.deleteBill(widget.billId);
 
-    if (widget.group != null) {
-      await groupProvider.fetchGroup(widget.group!.id);
+    if (group != null) {
+      await groupProvider.fetchGroup(group!.id);
     } else {
       await userProvider.reload();
     }
@@ -69,7 +102,7 @@ class _BillScreenState extends State<BillScreen> {
   Widget _proxyBuild(Bill bill, BuildContext context) {
     if (_isChanging.isEmpty) {
       for (var owe in bill.owes) {
-        _isChanging[owe] = false;
+        _isChanging[owe.id] = false;
       }
     }
 
@@ -135,7 +168,7 @@ class _BillScreenState extends State<BillScreen> {
                 Row(
                   children: [
                     if (_userIsCreditor(context, bill))
-                      _isChanging[owe]!
+                      _isChanging[owe.id]!
                           ? const SpinKitPulse(
                               color: Palette.alpha,
                               size: 48,
@@ -164,7 +197,7 @@ class _BillScreenState extends State<BillScreen> {
             MediumButton(
                 text: "Edit",
                 icon: Icons.edit,
-                callback: () {},
+                callback: () => _goToEditScreen(context),
                 color: Palette.alpha),
             const SizedBox(height: 10),
             _isDeleting
@@ -185,7 +218,8 @@ class _BillScreenState extends State<BillScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bill = widget.group!.getBill(widget.billId);
+    group = group ?? widget.group;
+    bill = group!.getBill(widget.billId);
 
     final billProvider = context.read<BillProvider>();
 

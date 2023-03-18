@@ -17,6 +17,26 @@ class BillProvider extends ChangeNotifier {
     return response["error"];
   }
 
+  Future<String?> editBill(
+      String billId, String title, double amount, Map<String, double> owes,
+      {String? groupId}) async {
+    double sum = 0;
+
+    for (final owe in owes.values) {
+      sum += owe;
+    }
+
+    owes[owes.keys.first] = amount - sum + owes[owes.keys.first]!;
+
+    final response = await client.put("bill/$billId", {
+      "title": title,
+      "amount": amount,
+      "owes": owes,
+    });
+
+    return response["error"];
+  }
+
   Future<void> changeStatus(String oweId, bool value) async {
     await client.put(
       "bill/status",
