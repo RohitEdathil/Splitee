@@ -27,14 +27,34 @@ class Bill extends BaseBill {
       this.creditor)
       : super(id, title, amount, isCreditor);
 
-  factory Bill.fromJson(Map json, BaseGroup group) {
+  factory Bill.fromJsonAndGroup(Map json, BaseGroup group) {
     final baseGroup = BaseBill.fromJson(json, false);
     final creditor = group.getUser(json['creditorId']);
 
     List<Owe> owes = [];
 
     for (var owe in json['owes']) {
-      owes.add(Owe.fromJson(owe, group));
+      owes.add(Owe.fromJsonAndGroup(owe, group));
+    }
+
+    return Bill(
+      baseGroup.id,
+      baseGroup.title,
+      baseGroup.amount,
+      baseGroup.isCreditor,
+      owes,
+      creditor,
+    );
+  }
+
+  factory Bill.fromJson(Map json) {
+    final baseGroup = BaseBill.fromJson(json, false);
+    final creditor = BaseUser.fromJson(json['creditor']);
+
+    List<Owe> owes = [];
+
+    for (var owe in json['owes']) {
+      owes.add(Owe.fromJson(owe));
     }
 
     return Bill(
@@ -51,17 +71,25 @@ class Bill extends BaseBill {
 class Owe {
   final String id;
   final double amount;
-  OweStatus status;
+  final OweStatus status;
   final BaseUser debtor;
 
   Owe(this.id, this.amount, this.status, this.debtor);
 
-  factory Owe.fromJson(Map json, BaseGroup group) {
+  factory Owe.fromJsonAndGroup(Map json, BaseGroup group) {
     return Owe(
       json['id'],
       json['amount'].toDouble(),
       json['status'] == 'PENDING' ? OweStatus.pending : OweStatus.paid,
       group.getUser(json['debtorId']),
+    );
+  }
+  factory Owe.fromJson(Map json) {
+    return Owe(
+      json['id'],
+      json['amount'].toDouble(),
+      json['status'] == 'PENDING' ? OweStatus.pending : OweStatus.paid,
+      BaseUser.fromJson(json['debtor']),
     );
   }
 }

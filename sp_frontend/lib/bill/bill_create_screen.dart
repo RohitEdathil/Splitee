@@ -203,6 +203,10 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
       await group.fetchGroup(widget.group!.id);
     } else {
       await user.reload();
+
+      if (_isEditing) {
+        await bill.getBill(widget.bill!.id, forceRefresh: true);
+      }
     }
     setState(() {
       _isLoading = false;

@@ -50,17 +50,14 @@ class BillProvider extends ChangeNotifier {
     });
   }
 
-  //TODO: View bill without group
-  // Future<Bill?> getBill(String id) async {
-  //   if (bills.containsKey(id)) return bills[id];
-  //   final response = await client.get("bill/$id");
+  Future<Bill?> getBill(String id, {bool forceRefresh = false}) async {
+    if (bills.containsKey(id) && !forceRefresh) return bills[id];
+    final response = await client.get("bill/$id");
 
-  //   final bill = Bill.fromJson(
-  //     response["bill"],
-  //   );
+    final bill = Bill.fromJson(response);
 
-  //   bills[bill.id] = bill;
+    bills[bill.id] = bill;
 
-  //   return bill;
-  // }
+    return bill;
+  }
 }

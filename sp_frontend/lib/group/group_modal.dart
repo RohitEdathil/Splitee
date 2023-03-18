@@ -61,7 +61,7 @@ class Group extends BaseGroup {
     Map<String, Bill> bills = {};
 
     for (var bill in json['bills']) {
-      bills[bill["id"]] = Bill.fromJson(bill, baseGroup);
+      bills[bill["id"]] = Bill.fromJsonAndGroup(bill, baseGroup);
     }
 
     return Group(

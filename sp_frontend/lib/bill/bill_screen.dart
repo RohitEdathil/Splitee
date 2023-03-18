@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +26,8 @@ class BillScreen extends StatefulWidget {
 class _BillScreenState extends State<BillScreen> {
   final Map<String, bool> _isChanging = {};
   bool _isDeleting = false;
-  late Bill bill;
+  bool _doneOnce = false;
+  Bill? bill;
   Group? group;
 
   bool _userIsCreditor(BuildContext context, Bill bill) =>
@@ -34,6 +36,7 @@ class _BillScreenState extends State<BillScreen> {
   Future<void> _changeStatus(bool value, Owe owe, BuildContext context) async {
     final billProvider = context.read<BillProvider>();
     final groupProvider = context.read<GroupProvider>();
+    final userProvider = context.read<UserProvider>();
 
     setState(() {
       _isChanging[owe.id] = true;
@@ -44,7 +47,8 @@ class _BillScreenState extends State<BillScreen> {
       await groupProvider.fetchGroup(group!.id);
       group = groupProvider.getGroup(group!.id);
     } else {
-      await context.read<UserProvider>().reload();
+      await userProvider.reload();
+      bill = await billProvider.getBill(bill!.id, forceRefresh: true);
     }
 
     setState(() {
@@ -53,23 +57,29 @@ class _BillScreenState extends State<BillScreen> {
   }
 
   void _goToEditScreen(BuildContext context) async {
+    final billProvider = context.read<BillProvider>();
+    final groupProvider = context.read<GroupProvider>();
     await Navigator.of(context).push(PageRouteBuilder(
         transitionsBuilder: transitionMaker,
         pageBuilder: (_, __, ___) => BillCreateScreen(
               group: group,
-              bill: group?.getBill(widget.billId),
+              bill: bill!,
             )));
     setState(() {
       if (group != null) {
         if (mounted) {
-          group = context.read<GroupProvider>().getGroup(group!.id);
+          group = groupProvider.getGroup(group!.id);
           bill = group!.getBill(widget.billId);
+        }
+      } else {
+        if (mounted) {
+          bill = billProvider.bills[widget.billId]!;
         }
       }
 
       _isChanging.clear();
 
-      for (var owe in bill.owes) {
+      for (var owe in bill!.owes) {
         _isChanging[owe.id] = false;
       }
     });
@@ -96,7 +106,7 @@ class _BillScreenState extends State<BillScreen> {
       _isDeleting = false;
     });
 
-    if (mounted) Navigator.of(context).pop();
+    if (context.mounted) Navigator.of(context).pop();
   }
 
   Widget _proxyBuild(Bill bill, BuildContext context) {
@@ -220,14 +230,43 @@ class _BillScreenState extends State<BillScreen> {
   @override
   Widget build(BuildContext context) {
     group = group ?? widget.group;
-    bill = group!.getBill(widget.billId);
+
+    if (group != null) {
+      bill = group!.getBill(widget.billId);
+    }
 
     final billProvider = context.read<BillProvider>();
 
     return Scaffold(
-        appBar: AppBar(),
-        body: bill != null
-            ? _proxyBuild(bill, context)
-            : Text("Not implemented"));
+      appBar: AppBar(),
+      body: bill != null
+          ? _proxyBuild(bill!, context)
+          : FutureBuilder(
+              future:
+                  billProvider.getBill(widget.billId, forceRefresh: !_doneOnce),
+              builder: (context, snapshot) {
+                if (!_doneOnce) {
+                  _doneOnce = true;
+                }
+
+                if (snapshot.hasError) {
+                  if (kDebugMode) {
+                    print(snapshot.error);
+                  }
+                }
+
+                if (snapshot.hasData) {
+                  bill = snapshot.data as Bill;
+                  return _proxyBuild(bill!, context);
+                } else {
+                  return const Center(
+                    child: SpinKitPulse(
+                      color: Palette.alpha,
+                      size: 48,
+                    ),
+                  );
+                }
+              }),
+    );
   }
 }
