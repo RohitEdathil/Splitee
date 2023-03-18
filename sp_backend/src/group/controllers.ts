@@ -139,6 +139,40 @@ async function leaveGroupController(
     },
   });
 
+  // Set all bills as individual
+  await db.bill.updateMany({
+    where: {
+      groupId: group.id,
+      creditorId: req.uid,
+    },
+    data: {
+      groupId: null,
+    },
+  });
+
+  // Fetch associated owes
+  const owes = await db.owe.findMany({
+    where: {
+      bill: {
+        groupId: group.id,
+      },
+      debtorId: req.uid,
+    },
+  });
+
+  // Set all owes as individual
+  await Promise.all(
+    owes.map(async (owe) => {
+      await db.bill.update({
+        where: {
+          id: owe.billId,
+        },
+        data: {
+          groupId: null,
+        },
+      });
+    })
+  );
   res.status(200).json({ message: "Left group" });
 }
 
