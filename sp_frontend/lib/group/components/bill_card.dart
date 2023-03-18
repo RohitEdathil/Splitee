@@ -8,7 +8,7 @@ import 'package:sp_frontend/theme/page_transition.dart';
 class BillCard extends StatelessWidget {
   final BaseBill bill;
   final Group? group;
-  const BillCard({super.key, required this.bill, required this.group});
+  const BillCard({super.key, required this.bill, this.group});
 
   void _goToBillScreen(BuildContext context) {
     Navigator.of(context).push(PageRouteBuilder(

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sp_frontend/bill/bill_modal.dart';
 import 'package:sp_frontend/bill/bill_provider.dart';
 import 'package:sp_frontend/bill/components/add_from_group.dart';
+import 'package:sp_frontend/bill/components/add_without_group.dart';
 import 'package:sp_frontend/components/custom_input.dart';
 import 'package:sp_frontend/components/custom_scackbar.dart';
 import 'package:sp_frontend/components/medium_button.dart';
@@ -78,17 +79,20 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
   }
 
   void _editParticipants(BuildContext context) async {
-    if (widget.group == null) {
-      // TODO: Groupless bills
-      return;
-    }
-
     final currentParticipants = _participants.keys.toList();
-
-    await showModalBottomSheet<List<BaseUser>>(
-        context: context,
-        builder: (_) =>
-            AddFromGroup(group: widget.group!, users: currentParticipants));
+    if (widget.group == null) {
+      await showModalBottomSheet<List<BaseUser>>(
+          context: context,
+          enableDrag: true,
+          // Fill
+          isScrollControlled: true,
+          builder: (_) => AddWithoutGroup(users: currentParticipants));
+    } else {
+      await showModalBottomSheet<List<BaseUser>>(
+          context: context,
+          builder: (_) =>
+              AddFromGroup(group: widget.group!, users: currentParticipants));
+    }
 
     for (final participant in currentParticipants) {
       if (_participants.containsKey(participant)) continue;
@@ -167,6 +171,7 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
 
     final group = context.read<GroupProvider>();
     final bill = context.read<BillProvider>();
+    final user = context.read<UserProvider>();
 
     final Map<String, double> owes = {};
 
@@ -196,6 +201,8 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
 
     if (widget.group != null) {
       await group.fetchGroup(widget.group!.id);
+    } else {
+      await user.reload();
     }
     setState(() {
       _isLoading = false;

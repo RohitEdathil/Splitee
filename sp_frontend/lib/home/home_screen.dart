@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:sp_frontend/bill/bill_create_screen.dart';
 import 'package:sp_frontend/components/custom_bottom_sheet.dart';
 import 'package:sp_frontend/group/add_group_sheet.dart';
 
 import 'package:sp_frontend/home/components/nav_bar.dart';
+import 'package:sp_frontend/home/views/bills_view.dart';
 import 'package:sp_frontend/home/views/settings_view.dart';
 import 'package:sp_frontend/theme/colors.dart';
 import 'package:sp_frontend/home/views/group_view.dart';
+import 'package:sp_frontend/theme/page_transition.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -54,7 +57,11 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _billAdd(BuildContext context) {}
+  void _billAdd(BuildContext context) {
+    Navigator.of(context).push(PageRouteBuilder(
+        transitionsBuilder: transitionMaker,
+        pageBuilder: (_, __, ___) => const BillCreateScreen()));
+  }
 
   Widget? _getFloatingActionButton() {
     if (page == 2) return null;
@@ -75,10 +82,10 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: _getFloatingActionButton(),
       body: PageView(
         controller: controller,
-        children: [
-          const GroupView(),
-          Container(),
-          const SettingsView(),
+        children: const [
+          GroupView(),
+          BillsView(),
+          SettingsView(),
         ],
       ),
       bottomNavigationBar: HomeNavigation(

@@ -25,4 +25,13 @@ class UserProvider extends ChangeNotifier {
   Future<void> changeEmail(String newEmail) async {
     await client.put("user", {"email": newEmail});
   }
+
+  Future<List<BaseUser>> search(String query) async {
+    if (query.isEmpty) return [];
+
+    final response = await client.get("user/search?query=$query");
+    return ((response["users"] ?? []) as List)
+        .map((e) => BaseUser.fromJson(e))
+        .toList();
+  }
 }

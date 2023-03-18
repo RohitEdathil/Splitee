@@ -167,16 +167,17 @@ class _BillScreenState extends State<BillScreen> {
               for (final owe in bill.owes)
                 Row(
                   children: [
-                    if (_userIsCreditor(context, bill))
-                      _isChanging[owe.id]!
-                          ? const SpinKitPulse(
-                              color: Palette.alpha,
-                              size: 48,
-                            )
-                          : Checkbox(
-                              value: owe.status == OweStatus.paid,
-                              onChanged: (v) =>
-                                  _changeStatus(v!, owe, context)),
+                    _isChanging[owe.id]!
+                        ? const SpinKitPulse(
+                            color: Palette.alpha,
+                            size: 48,
+                          )
+                        : Checkbox(
+                            value: owe.status == OweStatus.paid,
+                            fillColor: MaterialStateProperty.all(Palette.alpha),
+                            onChanged: _userIsCreditor(context, bill)
+                                ? (v) => _changeStatus(v!, owe, context)
+                                : null),
                     UserDispaly(user: owe.debtor),
                     const Spacer(),
                     const Text("₹"),
