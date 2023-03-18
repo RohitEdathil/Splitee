@@ -48,7 +48,8 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
   void _splitEqually() {
     if (_amountController.text.isEmpty) return;
 
-    final amount = _isPercentage ? 100 : double.parse(_amountController.text);
+    final amount =
+        _isPercentage ? 100 : double.tryParse(_amountController.text) ?? 0;
     final count = _participants.length;
 
     for (var participant in _participants.entries) {
@@ -93,19 +94,21 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
     }
 
     if (round) {
-      return (perc * double.parse(_amountController.text) / 100)
+      return (perc * (double.tryParse(_amountController.text) ?? 0) / 100)
           .toStringAsFixed(2)
           .toString();
     }
-    return (perc * double.parse(_amountController.text) / 100).toString();
+    return (perc * (double.tryParse(_amountController.text) ?? 0) / 100)
+        .toString();
   }
 
   String _percentageFromValue(TextEditingController controller) {
     if (_amountController.text.isEmpty) return "0.0";
 
-    final value = double.parse(controller.text);
+    final value = double.tryParse(controller.text) ?? 0;
 
-    return (value * 100 / double.parse(_amountController.text)).toString();
+    return (value * 100 / (double.tryParse(_amountController.text) ?? 0))
+        .toString();
   }
 
   void _reCalculate() {
@@ -148,15 +151,15 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
     final Map<String, double> owes = {};
 
     for (var participant in _participants.entries) {
-      owes[participant.key.id] = double.parse(participant.value.text);
+      owes[participant.key.id] = double.tryParse(participant.value.text) ?? 0;
     }
 
     setState(() {
       _isLoading = true;
     });
 
-    final response = await bill.createGroup(
-        _nameController.text, double.parse(_amountController.text), owes,
+    final response = await bill.createGroup(_nameController.text,
+        double.tryParse(_amountController.text) ?? 0, owes,
         groupId: widget.group?.id);
 
     if (response != null) {
@@ -277,6 +280,7 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
                               )
                             : TextField(
                                 controller: participant.value,
+                                onChanged: (_) => _reCalculate(),
                                 keyboardType:
                                     const TextInputType.numberWithOptions(
                                         decimal: true),
