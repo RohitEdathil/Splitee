@@ -40,6 +40,8 @@ class _AddWithoutGroupState extends State<AddWithoutGroup> {
 
   void _search() async {
     final users = await context.read<UserProvider>().search(controller.text);
+
+    if (!mounted) return;
     setState(() {
       results = users;
     });
