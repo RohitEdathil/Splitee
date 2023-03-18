@@ -146,7 +146,9 @@ async function searchUserController(
     };
   });
 
-  res.json(response);
+  res.json({
+    users: response,
+  });
 }
 
 export { userDataController, editUserController, searchUserController };
