@@ -1,5 +1,13 @@
 import { body, param } from "express-validator";
 
+const getBillValidator = [
+  param("billId")
+    .notEmpty()
+    .withMessage("Bill id is required")
+    .isMongoId()
+    .withMessage("Invalid bill id"),
+];
+
 const createBillValidator = [
   body("title")
     .notEmpty()
@@ -54,4 +62,5 @@ export {
   deleteBillValidator,
   editBillValidator,
   changeStatusValidator,
+  getBillValidator,
 };

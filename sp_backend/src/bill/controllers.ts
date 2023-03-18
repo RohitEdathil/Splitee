@@ -4,6 +4,49 @@ import { BadRequestError } from "../error/types";
 import { getGroupById, userInGroup } from "../group/services";
 import { getBillById, getOweById } from "./services";
 
+async function getBillController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const billId: string = req.params.billId;
+
+  // Find the bill
+  const bill = await db.bill.findUnique({
+    where: {
+      id: billId,
+    },
+    include: {
+      creditor: {
+        select: {
+          id: true,
+          name: true,
+          userId: true,
+        },
+      },
+      owes: {
+        include: {
+          debtor: {
+            select: {
+              id: true,
+              name: true,
+              userId: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  // Check if bill exists
+  if (!bill) {
+    next(new BadRequestError("Bill does not exist"));
+    return;
+  }
+
+  res.status(200).json(bill);
+}
+
 async function createBillController(
   req: Request,
   res: Response,
@@ -295,4 +338,5 @@ export {
   deleteBillController,
   editBillController,
   changeStatusController,
+  getBillController,
 };

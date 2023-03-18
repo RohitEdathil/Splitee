@@ -5,15 +5,24 @@ import {
   createBillController,
   deleteBillController,
   editBillController,
+  getBillController,
 } from "./controllers";
 import {
   changeStatusValidator,
   createBillValidator,
   deleteBillValidator,
   editBillValidator,
+  getBillValidator,
 } from "./validators";
 
 const router = Router();
+
+router.get(
+  "/:billId",
+  getBillValidator,
+  validationMiddleware,
+  getBillController
+);
 
 router.post(
   "/create",

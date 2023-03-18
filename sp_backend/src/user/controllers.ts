@@ -39,7 +39,14 @@ async function userDataController(
       // All the bills the user is the debtor of which are not in a group
       owes: {
         where: {
-          bill: { group: null },
+          bill: {
+            group: null,
+            creditor: {
+              userId: {
+                not: id,
+              },
+            },
+          },
         },
 
         include: {
