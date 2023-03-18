@@ -6,12 +6,14 @@ import {
   getGroupDataController,
   joinGroupController,
   leaveGroupController,
+  redistributeController,
 } from "./controllers";
 import {
   createGroupValidator,
   editGroupValidator,
   getGroupDataValidator,
   joinGroupValidator,
+  redistributeValidator,
 } from "./validators";
 
 const router = Router();
@@ -21,6 +23,13 @@ router.get(
   getGroupDataValidator,
   validationMiddleware,
   getGroupDataController
+);
+
+router.get(
+  "/redis/:groupId",
+  redistributeValidator,
+  validationMiddleware,
+  redistributeController
 );
 
 router.post(
