@@ -7,6 +7,7 @@ import 'package:sp_frontend/components/custom_input.dart';
 import 'package:sp_frontend/components/custom_scackbar.dart';
 import 'package:sp_frontend/components/medium_button.dart';
 import 'package:sp_frontend/components/user_display.dart';
+import 'package:sp_frontend/components/white_padded_container.dart';
 import 'package:sp_frontend/group/group_modal.dart';
 import 'package:sp_frontend/group/group_provider.dart';
 import 'package:sp_frontend/theme/colors.dart';
@@ -158,7 +159,7 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
       _isLoading = true;
     });
 
-    final response = await bill.createGroup(_nameController.text,
+    final response = await bill.createBill(_nameController.text,
         double.tryParse(_amountController.text) ?? 0, owes,
         groupId: widget.group?.id);
 
@@ -199,112 +200,130 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
             child: Column(
               children: [
                 // Inputs
-                CustomInput(
-                  color: Palette.alphaLight,
-                  controller: _nameController,
-                  hintText: "Title",
-                ),
-                const SizedBox(width: 20),
-                CustomInput(
-                  controller: _amountController,
-                  hintText: "Amount",
-                  color: Palette.alphaLight,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                ),
-
-                // % or ₹
-                Row(
+                WhitePaddedContainer(
+                    child: Column(
                   children: [
-                    ChoiceChip(
-                      selected: !_isPercentage,
-                      onSelected: (_) => _setPercentage(false),
-                      label: const Text("₹"),
+                    CustomInput(
+                      color: Palette.alphaLight,
+                      controller: _nameController,
+                      hintText: "Title",
                     ),
-                    const SizedBox(width: 8),
-                    ChoiceChip(
-                      selected: _isPercentage,
-                      onSelected: (_) => _setPercentage(true),
-                      label: const Text("%"),
-                    )
+                    const SizedBox(width: 20),
+                    CustomInput(
+                      controller: _amountController,
+                      hintText: "Amount",
+                      color: Palette.alphaLight,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                    ),
                   ],
-                ),
+                )),
 
-                // Participants header
-                Row(
+                WhitePaddedContainer(
+                    child: Column(
                   children: [
-                    Expanded(
-                      child: Text("Participants",
-                          style: Theme.of(context).textTheme.headlineSmall),
-                    ),
-
-                    // Add participant button
-                    TextButton(
-                      onPressed: () => _editParticipants(context),
-                      child: const Text("Edit"),
-                    ),
-
-                    // Split equally button
-                    TextButton(
-                      onPressed: _splitEqually,
-                      child: const Text("Split"),
-                    )
-                  ],
-                ),
-                for (final participant in _participants.entries)
-                  Row(
-                    children: [
-                      UserDispaly(user: participant.key),
-                      const Spacer(),
-                      if (_isPercentage) ...[
-                        SizedBox(
-                          width: 45,
-                          child: TextField(
-                            controller: participant.value,
-                            keyboardType: const TextInputType.numberWithOptions(
-                                decimal: true),
-                            onChanged: (_) => _reCalculate(),
-                          ),
+                    // % or ₹
+                    Row(
+                      children: [
+                        ChoiceChip(
+                          selected: !_isPercentage,
+                          onSelected: (_) => _setPercentage(false),
+                          label: const Text("₹"),
                         ),
-                        const Text("%"),
-                        const SizedBox(width: 20)
+                        const SizedBox(width: 8),
+                        ChoiceChip(
+                          selected: _isPercentage,
+                          onSelected: (_) => _setPercentage(true),
+                          label: const Text("%"),
+                        )
                       ],
-                      const Text("₹"),
-                      SizedBox(
-                        width: 70,
-                        child: _isPercentage
-                            ? Text(
-                                _valueFromPercentage(participant.value,
-                                    round: true),
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              )
-                            : TextField(
+                    ),
+
+                    // Participants header
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text("Participants",
+                              style: Theme.of(context).textTheme.headlineSmall),
+                        ),
+
+                        // Add participant button
+                        TextButton(
+                          onPressed: () => _editParticipants(context),
+                          child: const Text("Edit"),
+                        ),
+
+                        // Split equally button
+                        TextButton(
+                          onPressed: _splitEqually,
+                          child: const Text("Split"),
+                        )
+                      ],
+                    ),
+                    for (final participant in _participants.entries)
+                      Row(
+                        children: [
+                          UserDispaly(user: participant.key),
+                          const Spacer(),
+                          if (_isPercentage) ...[
+                            SizedBox(
+                              width: 45,
+                              child: TextField(
                                 controller: participant.value,
-                                onChanged: (_) => _reCalculate(),
                                 keyboardType:
                                     const TextInputType.numberWithOptions(
                                         decimal: true),
+                                onChanged: (_) => _reCalculate(),
                               ),
-                      )
-                    ],
-                  ),
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Text(
-                      _isPercentage ? "Total: ${_sum()}%" : "Total: ₹${_sum()}",
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineSmall!
-                          .copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 19,
-                            color: _isValid() ? Palette.alpha : Palette.beta,
-                          ),
+                            ),
+                            const Text("%"),
+                            const SizedBox(width: 20)
+                          ],
+                          const Text("₹"),
+                          SizedBox(
+                            width: 70,
+                            child: _isPercentage
+                                ? Text(
+                                    _valueFromPercentage(participant.value,
+                                        round: true),
+                                    style:
+                                        Theme.of(context).textTheme.bodyLarge,
+                                  )
+                                : TextField(
+                                    controller: participant.value,
+                                    onChanged: (_) => _reCalculate(),
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                            decimal: true),
+                                  ),
+                          )
+                        ],
+                      ),
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Text(
+                          _isPercentage
+                              ? "Total: ${_sum()}%"
+                              : "Total: ₹${_sum()}",
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall!
+                              .copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 19,
+                                color:
+                                    _isValid() ? Palette.alpha : Palette.beta,
+                              ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
+                  ],
+                )),
+
+                const SizedBox(height: 20),
+
                 _isLoading
                     ? const SpinKitPulse(
                         color: Palette.alpha,
