@@ -64,8 +64,8 @@ class APIClient {
   }
 
   Future<Map> delete(String path, Map<String, dynamic> body) async {
-    final response =
-        await httpClient.delete(Uri.parse(baseUrl + path), headers: _headers);
+    final response = await httpClient.delete(Uri.parse(baseUrl + path),
+        headers: _headers, body: jsonEncode(body));
 
     return _decodeResponse(response);
   }

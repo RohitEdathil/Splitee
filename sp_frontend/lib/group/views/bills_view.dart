@@ -12,7 +12,7 @@ class BillsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewCommons(title: 'Bills', children: [
       if (group.bills.isEmpty) const Empty(),
-      for (final bill in group.bills) BillCard(bill: bill)
+      for (final bill in group.bills.values) BillCard(bill: bill, group: group),
     ]);
   }
 }

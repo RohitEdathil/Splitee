@@ -28,7 +28,7 @@ class BaseGroup {
 }
 
 class Group extends BaseGroup {
-  final List<Bill> bills;
+  final Map<String, Bill> bills;
   final List<Payment> payments = [];
   late final List<MapEntry<BaseUser, double>> sortedBalances;
 
@@ -40,7 +40,7 @@ class Group extends BaseGroup {
       balances[user] = 0;
     }
 
-    for (final bill in bills) {
+    for (final bill in bills.values) {
       for (final owe in bill.owes) {
         if (owe.status == OweStatus.paid) continue;
 
@@ -58,10 +58,10 @@ class Group extends BaseGroup {
   factory Group.fromJson(Map json) {
     final BaseGroup baseGroup = BaseGroup.fromJson(json);
 
-    List<Bill> bills = [];
+    Map<String, Bill> bills = {};
 
     for (var bill in json['bills']) {
-      bills.add(Bill.fromJson(bill, baseGroup));
+      bills[bill["id"]] = Bill.fromJson(bill, baseGroup);
     }
 
     return Group(
@@ -70,6 +70,10 @@ class Group extends BaseGroup {
       baseGroup.users,
       bills,
     );
+  }
+
+  Bill getBill(String id) {
+    return bills[id]!;
   }
 }
 

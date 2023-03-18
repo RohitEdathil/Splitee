@@ -51,7 +51,7 @@ class Bill extends BaseBill {
 class Owe {
   final String id;
   final double amount;
-  final OweStatus status;
+  OweStatus status;
   final BaseUser debtor;
 
   Owe(this.id, this.amount, this.status, this.debtor);
