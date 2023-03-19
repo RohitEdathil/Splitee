@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sp_frontend/group/group_modal.dart';
-import 'package:sp_frontend/util/api_client.dart';
+import 'package:sp_frontend/api/api_client.dart';
 
 class GroupProvider extends ChangeNotifier {
   Map<String, Group> groups = {};

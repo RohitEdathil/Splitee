@@ -1,5 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sp_frontend/util/api_client.dart';
+import 'package:sp_frontend/api/api_client.dart';
 
 class AuthProvider {
   late SharedPreferences _prefs;

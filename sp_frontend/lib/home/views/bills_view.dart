@@ -5,7 +5,7 @@ import 'package:sp_frontend/components/screen_title.dart';
 import 'package:sp_frontend/group/components/bill_card.dart';
 import 'package:sp_frontend/user/user_modal.dart';
 import 'package:sp_frontend/user/user_provider.dart';
-import 'package:sp_frontend/util/empty.dart';
+import 'package:sp_frontend/components/empty.dart';
 
 class BillsView extends StatefulWidget {
   const BillsView({super.key});

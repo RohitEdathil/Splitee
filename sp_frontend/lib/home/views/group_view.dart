@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sp_frontend/components/screen_title.dart';
 import 'package:sp_frontend/home/components/group_card.dart';
 import 'package:sp_frontend/user/user_provider.dart';
-import 'package:sp_frontend/util/empty.dart';
+import 'package:sp_frontend/components/empty.dart';
 
 class GroupView extends StatelessWidget {
   const GroupView({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sp_frontend/bill/bill_modal.dart';
-import 'package:sp_frontend/util/api_client.dart';
+import 'package:sp_frontend/api/api_client.dart';
 
 class BillProvider extends ChangeNotifier {
   final Map<String, Bill> bills = {};
