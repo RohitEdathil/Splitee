@@ -6,10 +6,12 @@ class CustomInput extends StatelessWidget {
   final Color color;
   final TextInputType keyboardType;
   final TextEditingController controller;
+  final Function(String?)? onChanged;
   const CustomInput(
       {Key? key,
       this.isPassword = false,
       this.keyboardType = TextInputType.text,
+      this.onChanged,
       required this.controller,
       required this.hintText,
       required this.color})
@@ -23,6 +25,7 @@ class CustomInput extends StatelessWidget {
         controller: controller,
         obscureText: isPassword,
         keyboardType: keyboardType,
+        onChanged: onChanged,
         decoration: InputDecoration(
             hintText: hintText,
             border: OutlineInputBorder(

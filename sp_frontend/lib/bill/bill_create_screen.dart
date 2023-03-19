@@ -176,7 +176,10 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
     final Map<String, double> owes = {};
 
     for (var participant in _participants.entries) {
-      owes[participant.key.id] = double.tryParse(participant.value.text) ?? 0;
+      owes[participant.key.id] = double.tryParse(_isPercentage
+              ? _valueFromPercentage(participant.value)
+              : participant.value.text) ??
+          0;
     }
 
     setState(() {
@@ -245,6 +248,7 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
                     const SizedBox(width: 20),
                     CustomInput(
                       controller: _amountController,
+                      onChanged: (_) => _reCalculate(),
                       hintText: "Amount",
                       color: Palette.alphaLight,
                       keyboardType:
