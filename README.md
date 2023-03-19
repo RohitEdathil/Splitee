@@ -79,7 +79,7 @@ Password: qwerty
 ```
 
 ## Gallery
-
+<span>
 <img src="screenshots/login.jpg" width="250">
 <img src="screenshots/groups.jpg" width="250">
 <img src="screenshots/indi.jpg" width="250">
@@ -92,3 +92,4 @@ Password: qwerty
 <img src="screenshots/group_options.jpg" width="250">
 <img src="screenshots/magic.jpg" width="250">
 <img src="screenshots/user_settings.jpg" width="250">
+</span>
