@@ -11,8 +11,10 @@ class BaseGroup {
   factory BaseGroup.fromJson(Map json) {
     Map<String, BaseUser> users = {};
 
-    for (var user in json['users']) {
-      users[user['id']] = BaseUser.fromJson(user);
+    if (json['users'] != null) {
+      for (var user in json['users']) {
+        users[user['id']] = BaseUser.fromJson(user);
+      }
     }
 
     return BaseGroup(

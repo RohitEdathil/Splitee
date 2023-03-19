@@ -3,6 +3,7 @@ import 'package:sp_frontend/auth/loading_screen.dart';
 import 'package:sp_frontend/auth/login_screen.dart';
 import 'package:sp_frontend/group/join_group_screen.dart';
 import 'package:sp_frontend/group/group_screen.dart';
+import 'package:sp_frontend/group/simplify_screen.dart';
 
 import 'package:sp_frontend/home/home_screen.dart';
 
@@ -15,4 +16,5 @@ final Map<String, Widget Function(BuildContext)> routes = {
 
 final Map<String, Widget Function(BuildContext, String)> routesWithArgs = {
   '/group': (context, args) => GroupScreen(groupId: args),
+  '/simplify': (context, args) => SimplifyScreen(groupId: args),
 };

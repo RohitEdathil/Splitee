@@ -41,4 +41,8 @@ class GroupProvider extends ChangeNotifier {
       "groupId": groupId,
     });
   }
+
+  Future<void> redistribute(String groupId) async {
+    await client.get("group/redis/$groupId");
+  }
 }

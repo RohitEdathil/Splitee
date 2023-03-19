@@ -33,7 +33,7 @@ class _GroupScreenState extends State<GroupScreen> {
         backgroundColor: Palette.alpha,
         foregroundColor: Palette.alphaLight,
         onPressed: () =>
-            curPos == 1 ? _magicSummarize(context) : _billAdd(context),
+            curPos == 1 ? _magicSimplify(context) : _billAdd(context),
         child: Icon(curPos == 0
             ? Icons.add_shopping_cart
             : Icons.auto_fix_high_rounded),
@@ -48,7 +48,9 @@ class _GroupScreenState extends State<GroupScreen> {
         pageBuilder: (_, __, ___) => BillCreateScreen(group: group)));
   }
 
-  void _magicSummarize(BuildContext context) {}
+  void _magicSimplify(BuildContext context) {
+    Navigator.pushNamed(context, '/simplify', arguments: widget.groupId);
+  }
 
   @override
   Widget build(BuildContext context) {
