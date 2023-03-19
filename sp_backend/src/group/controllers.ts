@@ -1,5 +1,4 @@
 import { MaxHeap, MinHeap } from "@datastructures-js/heap";
-import { Bill } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
 import { db } from "../db";
 import { BadRequestError } from "../error/types";
