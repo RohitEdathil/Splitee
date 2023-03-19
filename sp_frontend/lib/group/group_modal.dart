@@ -38,21 +38,26 @@ class Group extends BaseGroup {
       : super(name, id, users) {
     Map<BaseUser, double> balances = {};
 
+    // Initialize balances to 0
     for (final user in users.values) {
       balances[user] = 0;
     }
 
     for (final bill in bills.values) {
       for (final owe in bill.owes) {
+        // Skip if already paid
         if (owe.status == OweStatus.paid) continue;
 
+        // Update balances
         balances[owe.debtor] = balances[owe.debtor]! - owe.amount;
         balances[bill.creditor] = balances[bill.creditor]! + owe.amount;
 
+        // Add payment
         payments.add(Payment(owe.debtor, bill.creditor, owe.amount));
       }
     }
 
+    // Sort balances
     sortedBalances = balances.entries.toList();
     sortedBalances.sort((a, b) => -a.value.compareTo(b.value));
   }

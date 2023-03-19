@@ -27,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     controller.addListener(() {
+      // Close bottom sheet if open when page changes
       if (isBottomSheetOpen) {
         sheetController.close();
         isBottomSheetOpen = false;
@@ -38,10 +39,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _groupAdd(BuildContext context) {
+    // Close bottom sheet if open when button is pressed
     if (isBottomSheetOpen) {
       sheetController.close();
       isBottomSheetOpen = false;
-
       return;
     }
 
@@ -52,6 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
     isBottomSheetOpen = true;
 
+    // Set isBottomSheetOpen to false when bottom sheet is closed
     sheetController.closed.then((value) {
       isBottomSheetOpen = false;
     });
@@ -64,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget? _getFloatingActionButton() {
+    // Only show for first two pages
     if (page == 2) return null;
 
     return Builder(builder: (context) {

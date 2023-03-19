@@ -29,6 +29,8 @@ class _SettingsViewState extends State<SettingsView> {
     final user = context.read<UserProvider>();
 
     final newName = _nameController.text;
+
+    // Validate
     if (newName.isEmpty || newName == user.currentUser!.name) return;
 
     setState(() {
@@ -36,7 +38,6 @@ class _SettingsViewState extends State<SettingsView> {
     });
 
     await user.changeName(newName);
-
     await user.reload();
 
     setState(() {
@@ -48,6 +49,7 @@ class _SettingsViewState extends State<SettingsView> {
     final user = context.read<UserProvider>();
 
     final newEmail = _emailController.text;
+    // Validate
     if (newEmail.isEmpty || newEmail == user.currentUser!.email) return;
 
     setState(() {
@@ -55,7 +57,6 @@ class _SettingsViewState extends State<SettingsView> {
     });
 
     await user.changeEmail(newEmail);
-
     await user.reload();
 
     setState(() {
@@ -65,9 +66,7 @@ class _SettingsViewState extends State<SettingsView> {
 
   void _logout(BuildContext context) {
     final auth = context.read<AuthProvider>();
-
     auth.logOut();
-
     Navigator.of(context).pushNamed('/');
   }
 
@@ -76,6 +75,7 @@ class _SettingsViewState extends State<SettingsView> {
     final user = context.read<UserProvider>().currentUser!;
 
     if (!_doneOnce) {
+      // Set initial values only once
       _nameController.text = user.name;
       _emailController.text = user.email;
       _doneOnce = true;
@@ -88,6 +88,8 @@ class _SettingsViewState extends State<SettingsView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const ScreenTitle(title: "Settings"),
+
+            // Name
             WhitePaddedContainer(
                 child: Column(
               children: [
@@ -106,6 +108,7 @@ class _SettingsViewState extends State<SettingsView> {
                       )
               ],
             )),
+            // Email
             WhitePaddedContainer(
                 child: Column(
               children: [
@@ -124,6 +127,7 @@ class _SettingsViewState extends State<SettingsView> {
                       )
               ],
             )),
+            // Logout
             OptionButton(
                 text: "Logout",
                 icon: Icons.logout,

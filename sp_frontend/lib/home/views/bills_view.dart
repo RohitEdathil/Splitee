@@ -23,6 +23,7 @@ class _BillsViewState extends State<BillsView> {
     });
   }
 
+  /// Filters the bills of the user based on [_isCredit]
   List<BaseBill> _getBills(User user) {
     return user.bills.where((bill) => bill.isCreditor == _isCredit).toList();
   }

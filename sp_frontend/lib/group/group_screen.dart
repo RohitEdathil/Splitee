@@ -26,6 +26,7 @@ class _GroupScreenState extends State<GroupScreen> {
   int curPos = 0;
 
   Widget? _getFloatingActionButton() {
+    // Only show for first two pages
     if (curPos >= 2) return null;
 
     return Builder(builder: (context) {

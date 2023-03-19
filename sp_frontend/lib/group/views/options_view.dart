@@ -51,6 +51,7 @@ class _OptionsViewState extends State<OptionsView> {
     final groupProvider = context.read<GroupProvider>();
     final user = context.read<UserProvider>();
 
+    // Fetch and validate
     final newName = controller.text;
     if (newName.isEmpty || newName == widget.group.name) return;
 

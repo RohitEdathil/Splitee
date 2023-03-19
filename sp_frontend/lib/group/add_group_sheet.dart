@@ -52,10 +52,12 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(children: [
+        // Inputs
         CustomInput(
             controller: _nameController,
             hintText: "Group Name",
             color: Palette.betaLight),
+        // Actions
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

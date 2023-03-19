@@ -48,21 +48,23 @@ class _JoinGroupScreenState extends State<JoinGroupScreen> {
 
     final response = await group.joinGroup(result!['id']);
 
+    // Reload user if no error
     if (response == null) {
       await user.reload();
     }
 
-    if (mounted) {
-      if (response == null) {
-        Navigator.pop(context, response);
-        return;
-      }
-      ScaffoldMessenger.of(context)
-          .showSnackBar(customSnackBar(context, response));
-      setState(() {
-        _isJoining = false;
-      });
+    if (!mounted) return;
+
+    // Pop if no error
+    if (response == null) {
+      Navigator.pop(context, response);
+      return;
     }
+    ScaffoldMessenger.of(context)
+        .showSnackBar(customSnackBar(context, response));
+    setState(() {
+      _isJoining = false;
+    });
   }
 
   @override
@@ -70,6 +72,7 @@ class _JoinGroupScreenState extends State<JoinGroupScreen> {
     return Scaffold(
       body: Column(
         children: <Widget>[
+          // QR View
           Expanded(
             flex: 5,
             child: QRView(
@@ -77,6 +80,7 @@ class _JoinGroupScreenState extends State<JoinGroupScreen> {
               onQRViewCreated: _onQRViewCreated,
             ),
           ),
+          // Result
           Expanded(
             flex: 1,
             child: Center(
@@ -123,7 +127,7 @@ class _JoinGroupScreenState extends State<JoinGroupScreen> {
       setState(() {
         try {
           final details = jsonDecode(scanData.code!);
-
+          // Validate
           if (details['name'] == null ||
               details['id'] == null ||
               details['name'].runtimeType != String ||
@@ -131,6 +135,7 @@ class _JoinGroupScreenState extends State<JoinGroupScreen> {
 
           result = details;
         } catch (e) {
+          // Invalid QR code
           if (kDebugMode) print(e);
         }
       });
