@@ -49,8 +49,10 @@ class AuthProvider {
 
     // Sets and saves credentials on success
     if (response['token'] != null) {
+      this.userId = response['userId'];
       _token = response['token'];
       _prefs.setString('token', _token!);
+      _prefs.setString('userId', userId);
       client.setToken(_token!);
     }
 

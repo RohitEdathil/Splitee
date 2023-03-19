@@ -67,7 +67,7 @@ class _SettingsViewState extends State<SettingsView> {
   void _logout(BuildContext context) {
     final auth = context.read<AuthProvider>();
     auth.logOut();
-    Navigator.of(context).pushNamed('/');
+    Navigator.of(context).pushReplacementNamed('/');
   }
 
   @override
