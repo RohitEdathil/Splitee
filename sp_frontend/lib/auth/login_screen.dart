@@ -32,6 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _callback(BuildContext context) async {
+    // Reads form data
     String userId = _userIdCtrlr.text.trim();
     String password = _passwordCtrlr.text;
     String name = _nameCtrlr.text.trim();
@@ -40,23 +41,13 @@ class _LoginScreenState extends State<LoginScreen> {
     final auth = context.read<AuthProvider>();
 
     if (_loginMode) {
+      // Login validation
       if (userId.isEmpty || password.isEmpty) {
         _errorPopup("Please fill all the fields", context);
         return;
       }
-      _toggleLoading();
-      auth.login(userId, password).then((error) => {
-            if (error != null)
-              {
-                _errorPopup(error, context),
-                _toggleLoading(),
-              }
-            else
-              {
-                Navigator.of(context).pushReplacementNamed('/'),
-              }
-          });
     } else {
+      // Signup validation
       if (userId.isEmpty || password.isEmpty || name.isEmpty || email.isEmpty) {
         _errorPopup("Please fill all the fields", context);
         return;
@@ -66,20 +57,24 @@ class _LoginScreenState extends State<LoginScreen> {
         _errorPopup("Please enter a valid email address", context);
         return;
       }
+    }
 
+    _toggleLoading();
+
+    // Login / Signup
+    final error = _loginMode
+        ? await auth.login(userId, password)
+        : await auth.signUp(userId, password, name, email);
+
+    // Ensures widget is mounted
+    if (!mounted) return;
+
+    // Shows error if any else sends to loading screen
+    if (error != null) {
+      _errorPopup(error, context);
       _toggleLoading();
-
-      auth.signUp(userId, password, name, email).then((error) => {
-            if (error != null)
-              {
-                _errorPopup(error, context),
-                _toggleLoading(),
-              }
-            else
-              {
-                Navigator.of(context).pushReplacementNamed('/'),
-              }
-          });
+    } else {
+      Navigator.of(context).pushReplacementNamed('/');
     }
   }
 
@@ -111,6 +106,8 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 50),
+
+              // Illustration
               Center(
                 child: Transform.scale(
                   scale: 1.3,
@@ -123,6 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Title
                     const Text(
                       "Splitee",
                       style:
@@ -131,11 +129,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(
                       height: 10,
                     ),
+
+                    // Sub heading
                     const Text(
                       "Split your bills easily",
                       style: TextStyle(fontSize: 14),
                     ),
                     const SizedBox(height: 40),
+
+                    // Inputs
                     CustomInput(
                       controller: _userIdCtrlr,
                       hintText: "User ID",
@@ -161,6 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           hintText: "Password",
                           color: Palette.alphaLight,
                         ),
+                        // Password visibility toggle
                         Align(
                           alignment: Alignment.centerRight,
                           child: SizedBox(
@@ -174,6 +177,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         )
                       ],
                     ),
+
+                    // Main button
                     const SizedBox(height: 10),
                     _isLoading
                         ? const SpinKitPulse(
@@ -185,6 +190,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             text: _loginMode ? "Login" : "Sign Up",
                             color: Palette.alpha,
                             icon: Icons.login),
+
+                    // Mode toggle
                     TextButton(
                       onPressed: () => _toggleMode(context),
                       style: ButtonStyle(

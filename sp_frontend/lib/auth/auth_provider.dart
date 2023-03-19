@@ -10,10 +10,12 @@ class AuthProvider {
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
 
+    // Attempts to load saved credentials
     _token = _prefs.getString('token');
     userId = _prefs.getString('userId');
 
     if (_token != null) {
+      // Passes token to API client
       client.setToken(_token!);
     }
   }
@@ -24,6 +26,7 @@ class AuthProvider {
       'password': password,
     });
 
+    // Sets and saves credentials on success
     if (response['token'] != null) {
       _token = response['token'];
       this.userId = response['userId'];
@@ -44,6 +47,7 @@ class AuthProvider {
       'email': email,
     });
 
+    // Sets and saves credentials on success
     if (response['token'] != null) {
       _token = response['token'];
       _prefs.setString('token', _token!);
@@ -54,6 +58,7 @@ class AuthProvider {
   }
 
   void logOut() {
+    // Removes and deletes credentials
     _token = null;
     _prefs.remove('token');
     userId = null;

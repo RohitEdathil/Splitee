@@ -14,12 +14,16 @@ class LoadingScreen extends StatelessWidget {
 
     final navigator = Navigator.of(context);
 
+    // Initializes auth module
     await auth.init();
+
+    // Sends to login screen if not logged in
     if (!auth.isAuthenticated) {
       navigator.pushReplacementNamed('/login');
       return;
     }
 
+    // Loads user detail and sends to home
     await user.load(auth.userId!);
     navigator.pushReplacementNamed('/home');
   }
