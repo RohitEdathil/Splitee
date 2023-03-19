@@ -1,4 +1,5 @@
 import { MaxHeap, MinHeap } from "@datastructures-js/heap";
+import { Status } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
 import { db } from "../db";
 import { BadRequestError } from "../error/types";
@@ -258,6 +259,8 @@ async function redistributeController(
 
     for (const owe of bill.owes) {
       if (!balance.has(owe.debtorId)) balance.set(owe.debtorId, 0);
+
+      if (owe.status === Status.PAID) continue;
 
       balance.set(bill.creditorId, balance.get(bill.creditorId)! + owe.amount);
       balance.set(owe.debtorId, balance.get(owe.debtorId)! - owe.amount);
