@@ -22,10 +22,12 @@ class BillProvider extends ChangeNotifier {
       {String? groupId}) async {
     double sum = 0;
 
+    // Recalculate the sum of the owes
     for (final owe in owes.values) {
       sum += owe;
     }
 
+    // If the sum is different, adjust the first owe to account for small differences
     owes[owes.keys.first] = amount - sum + owes[owes.keys.first]!;
 
     final response = await client.put("bill/$billId", {
@@ -51,11 +53,11 @@ class BillProvider extends ChangeNotifier {
   }
 
   Future<Bill?> getBill(String id, {bool forceRefresh = false}) async {
+    // If the bill is already in the cache, and we don't want to force a refresh, return the cached bill
     if (bills.containsKey(id) && !forceRefresh) return bills[id];
+
     final response = await client.get("bill/$id");
-
     final bill = Bill.fromJson(response);
-
     bills[bill.id] = bill;
 
     return bill;

@@ -15,6 +15,7 @@ class AddFromGroup extends StatefulWidget {
 }
 
 class _AddFromGroupState extends State<AddFromGroup> {
+  /// Adds or removes a user
   void _toggleUser(bool v, BaseUser user) {
     {
       setState(() {
@@ -35,6 +36,7 @@ class _AddFromGroupState extends State<AddFromGroup> {
       padding: const EdgeInsets.all(20.0),
       child: Wrap(children: [
         for (final user in widget.group.users.entries)
+          // Each user
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ChoiceChip(

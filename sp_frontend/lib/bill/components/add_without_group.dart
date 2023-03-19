@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:provider/provider.dart';
 import 'package:sp_frontend/components/custom_input.dart';
 import 'package:sp_frontend/components/user_display.dart';
@@ -22,12 +20,12 @@ class _AddWithoutGroupState extends State<AddWithoutGroup> {
 
   List<BaseUser> results = [];
 
+  // Fast lookup set
   final Set<String> _userIds = {};
 
   @override
   void initState() {
     super.initState();
-    controller.addListener(() => _search());
 
     _userIds.addAll(widget.users.map((e) => e.id));
   }
@@ -38,6 +36,7 @@ class _AddWithoutGroupState extends State<AddWithoutGroup> {
     super.dispose();
   }
 
+  /// Initiates search
   void _search() async {
     final users = await context.read<UserProvider>().search(controller.text);
 
@@ -77,7 +76,7 @@ class _AddWithoutGroupState extends State<AddWithoutGroup> {
                 child: Column(
                   children: [
                     for (final user in widget.users)
-                      // Selected user
+                      // One selected user
                       Row(
                         children: [
                           IconButton(
@@ -95,11 +94,15 @@ class _AddWithoutGroupState extends State<AddWithoutGroup> {
               // Search layer
               Column(
                 children: [
+                  // Search bar
                   CustomInput(
                     controller: controller,
                     hintText: "Search by user id",
                     color: Colors.white,
+                    onChanged: (_) => _search(),
                   ),
+
+                  // Results display
                   if (results.isNotEmpty)
                     WhitePaddedContainer(
                         child: Column(children: [
@@ -118,6 +121,7 @@ class _AddWithoutGroupState extends State<AddWithoutGroup> {
                             UserDispaly(user: user),
                           ],
                         ),
+                      // Close button
                       TextButton.icon(
                           label: const Text("Close"),
                           onPressed: () => setState(() => results = []),

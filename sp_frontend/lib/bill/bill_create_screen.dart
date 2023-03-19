@@ -16,6 +16,11 @@ import 'package:sp_frontend/theme/colors.dart';
 import 'package:sp_frontend/user/user_modal.dart';
 import 'package:sp_frontend/user/user_provider.dart';
 
+/// Creates / Edits a bill
+///
+/// If [group] is null, the bill is created without a group
+///
+/// If [bill] is null, works in create mode else edit mode
 class BillCreateScreen extends StatefulWidget {
   final Group? group;
   final Bill? bill;
@@ -40,19 +45,21 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
   @override
   void initState() {
     super.initState();
-    if (!_isEditing) return;
 
+    // Initialize the bill details in edit mode
+    if (!_isEditing) return;
     _nameController.text = widget.bill!.title;
     _amountController.text = widget.bill!.amount.toString();
-
     for (var owe in widget.bill!.owes) {
       _participants[owe.debtor] =
           TextEditingController(text: owe.amount.toString());
     }
   }
 
+  /// Toggles % and ₹
   void _setPercentage(bool value) {
     for (var participant in _participants.entries) {
+      // Converts b/w % and ₹
       if (value) {
         participant.value.text = _percentageFromValue(participant.value);
       } else {
@@ -65,13 +72,17 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
     });
   }
 
+  /// Splits the bill equally
   void _splitEqually() {
+    // Ensures amount is present
     if (_amountController.text.isEmpty) return;
 
+    // Reads amount in ₹ mode, 100 in % mode
     final amount =
         _isPercentage ? 100 : double.tryParse(_amountController.text) ?? 0;
     final count = _participants.length;
 
+    // Splits by division
     for (var participant in _participants.entries) {
       participant.value.text = (amount / count).toString();
     }
@@ -79,7 +90,10 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
   }
 
   void _editParticipants(BuildContext context) async {
+    // Fetches current participants
     final currentParticipants = _participants.keys.toList();
+
+    // Navigates to apporpriate AddWidget based on availability of group
     if (widget.group == null) {
       await showModalBottomSheet<List<BaseUser>>(
           context: context,
@@ -94,38 +108,52 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
               AddFromGroup(group: widget.group!, users: currentParticipants));
     }
 
+    // currentParticipants is modified in-place by the AddWidget
+
     for (final participant in currentParticipants) {
+      // Doesn't change existing participants
       if (_participants.containsKey(participant)) continue;
+
+      // Initializes new ones as 0
       _participants[participant] = TextEditingController(text: "0");
     }
 
+    // Remove removed participants
     _participants.removeWhere(
         (participant, _) => !currentParticipants.contains(participant));
 
     setState(() {});
   }
 
+  /// Converts to ₹ from % (can optionally round, for displaying ONLY!)
   String _valueFromPercentage(TextEditingController controller,
       {bool round = false}) {
+    // 0.0 for empty
     if (_amountController.text.isEmpty) return "0.0";
 
     final perc = double.tryParse(controller.text);
 
+    // 0 for null
     if (perc == null) {
       controller.text = "0";
       return "0";
     }
 
+    // With rounding
     if (round) {
       return (perc * (double.tryParse(_amountController.text) ?? 0) / 100)
           .toStringAsFixed(2)
           .toString();
     }
+
+    // Without rounding
     return (perc * (double.tryParse(_amountController.text) ?? 0) / 100)
         .toString();
   }
 
+  /// Converts to % from ₹
   String _percentageFromValue(TextEditingController controller) {
+    // 0.0 for empty
     if (_amountController.text.isEmpty) return "0.0";
 
     final value = double.tryParse(controller.text) ?? 0;
@@ -134,6 +162,7 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
         .toString();
   }
 
+  /// Refresh for value changes
   void _reCalculate() {
     setState(() {});
   }
@@ -148,6 +177,7 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
     return s;
   }
 
+  /// Checks if sum is same as amount
   bool _isValid() => _isPercentage
       ? _sum() == 100.0
       : _sum().toStringAsFixed(2) ==
@@ -159,11 +189,13 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
   }
 
   void _createOrSave(BuildContext context) async {
+    // Ensures validity
     if (!_isValid()) {
       _errorPopup("Sum doesn't match amount", context);
       return;
     }
 
+    // Validation for text fields
     if (_amountController.text.isEmpty || _nameController.text.isEmpty) {
       _errorPopup("Please fill in the required fields", context);
       return;
@@ -175,6 +207,7 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
 
     final Map<String, double> owes = {};
 
+    // Generates owes to be send to server
     for (var participant in _participants.entries) {
       owes[participant.key.id] = double.tryParse(_isPercentage
               ? _valueFromPercentage(participant.value)
@@ -186,13 +219,16 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
       _isLoading = true;
     });
 
+    final amount = double.tryParse(_amountController.text) ?? 0;
+
+    // Edits/Create based on mode
     final response = _isEditing
-        ? (await bill.editBill(widget.bill!.id, _nameController.text,
-            double.tryParse(_amountController.text) ?? 0, owes))
-        : (await bill.createBill(_nameController.text,
-            double.tryParse(_amountController.text) ?? 0, owes,
+        ? (await bill.editBill(
+            widget.bill!.id, _nameController.text, amount, owes))
+        : (await bill.createBill(_nameController.text, amount, owes,
             groupId: widget.group?.id));
 
+    // Shows any errors
     if (response != null) {
       if (!mounted) return;
       _errorPopup(response, context);
@@ -202,11 +238,13 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
       return;
     }
 
+    // Refreshes group if available, else refreshes user
     if (widget.group != null) {
       await group.fetchGroup(widget.group!.id);
     } else {
       await user.reload();
 
+      // Refreshes bill when no group and is editing
       if (_isEditing) {
         await bill.getBill(widget.bill!.id, forceRefresh: true);
       }
@@ -222,6 +260,7 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
     final user = context.read<UserProvider>();
     final currentUser = user.currentUser;
 
+    // Add user a participant if not already and creating a bill
     if (!_participants.containsKey(currentUser) && !_isEditing) {
       _participants[currentUser!] = TextEditingController(text: "0");
     }
@@ -299,10 +338,14 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
                       ],
                     ),
                     for (final participant in _participants.entries)
+
+                      // Each participant
                       Row(
                         children: [
                           UserDispaly(user: participant.key),
                           const Spacer(),
+
+                          // Percentage mode additions
                           if (_isPercentage) ...[
                             SizedBox(
                               width: 45,
@@ -317,6 +360,8 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
                             const Text("%"),
                             const SizedBox(width: 20)
                           ],
+
+                          // Value is text field if not percentage mode
                           const Text("₹"),
                           SizedBox(
                             width: 70,
@@ -337,6 +382,8 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
                           )
                         ],
                       ),
+
+                    // Total
                     Align(
                       alignment: Alignment.topLeft,
                       child: Padding(
@@ -362,6 +409,7 @@ class _BillCreateScreenState extends State<BillCreateScreen> {
 
                 const SizedBox(height: 20),
 
+                // Create or save button
                 _isLoading
                     ? const SpinKitPulse(
                         color: Palette.alpha,

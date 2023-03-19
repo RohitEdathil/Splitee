@@ -30,6 +30,7 @@ class _BillScreenState extends State<BillScreen> {
   Bill? bill;
   Group? group;
 
+  /// Checks if the user is the creditor of the bill
   bool _userIsCreditor(BuildContext context, Bill bill) =>
       context.read<UserProvider>().currentUser!.id == bill.creditor.id;
 
@@ -41,8 +42,11 @@ class _BillScreenState extends State<BillScreen> {
     setState(() {
       _isChanging[owe.id] = true;
     });
+
+    // Call the API to change the status
     await billProvider.changeStatus(owe.id, value);
 
+    // Reload the bill based on whether it is a group bill or not
     if (group != null) {
       await groupProvider.fetchGroup(group!.id);
       group = groupProvider.getGroup(group!.id);
@@ -59,6 +63,8 @@ class _BillScreenState extends State<BillScreen> {
   void _goToEditScreen(BuildContext context) async {
     final billProvider = context.read<BillProvider>();
     final groupProvider = context.read<GroupProvider>();
+
+    // Go to the edit screen
     await Navigator.of(context).push(PageRouteBuilder(
         transitionsBuilder: transitionMaker,
         pageBuilder: (_, __, ___) => BillCreateScreen(
@@ -66,6 +72,7 @@ class _BillScreenState extends State<BillScreen> {
               bill: bill!,
             )));
     setState(() {
+      // Reload the bill based on whether it is a group bill or not
       if (group != null) {
         if (mounted) {
           group = groupProvider.getGroup(group!.id);
@@ -78,7 +85,7 @@ class _BillScreenState extends State<BillScreen> {
       }
 
       _isChanging.clear();
-
+      // Reset the _isChanging map
       for (var owe in bill!.owes) {
         _isChanging[owe.id] = false;
       }
@@ -110,6 +117,7 @@ class _BillScreenState extends State<BillScreen> {
   }
 
   Widget _proxyBuild(Bill bill, BuildContext context) {
+    // Initialize the _isChanging map
     if (_isChanging.isEmpty) {
       for (var owe in bill.owes) {
         _isChanging[owe.id] = false;
@@ -175,6 +183,7 @@ class _BillScreenState extends State<BillScreen> {
                 ),
               ),
               for (final owe in bill.owes)
+                // Each owe
                 Row(
                   children: [
                     _isChanging[owe.id]!
@@ -242,6 +251,7 @@ class _BillScreenState extends State<BillScreen> {
       body: bill != null
           ? _proxyBuild(bill!, context)
           : FutureBuilder(
+              // Force refresh only once
               future:
                   billProvider.getBill(widget.billId, forceRefresh: !_doneOnce),
               builder: (context, snapshot) {
@@ -259,6 +269,7 @@ class _BillScreenState extends State<BillScreen> {
                   bill = snapshot.data as Bill;
                   return _proxyBuild(bill!, context);
                 } else {
+                  // Show a loading indicator
                   return const Center(
                     child: SpinKitPulse(
                       color: Palette.alpha,
