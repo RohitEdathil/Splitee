@@ -4,7 +4,7 @@
   "description": "API for the cost splitting app",
   "main": "index.ts",
   "scripts": {
-    "build": "npx prisma generate && tsc",
+    "build": "npm install && npx prisma generate && tsc",
     "start": "nodemon ./dist/index.js",
     "dev": "npx prisma generate && nodemon --exec npx ts-node -- ./src/index.ts",
     "prod": "npm run build && npm run start",
