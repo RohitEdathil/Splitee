@@ -1,29 +1,57 @@
-### Express - Typescript Boilerplate with MongoDB & Auth0 with sample endpoints.
+# Splitee - API
+
+All the backend code for Splitee.
+
+## [Postman Documentation](https://documenter.getpostman.com/view/19943106/2s93JzMg4z)
+
+## Why did I use this stack?
+
+### Why TypeScript?
+
+- Always wanted to use it in a project
+- Likes type-safety
+
+### Why Express?
+
+- Big ecosystem
+- Easy to use
+
+### Why MongoDB?
+
+- Always wanted to use it in a project
+- Flexibility
+- Scalability
+- Easy to deploy (MongoDB Atlas)
+
+### Why Prisma?
+
+- Easy to use
+- Always wanted to use it in a project
 
 ## Setup
-Use `npm` to install the project dependencies:
 
-```bash
-npm install
+Assuming you have Node.js installed, run the following commands:
+
+- Clone the repository
+- Change directory to `sp_backend`
+- Run `npm install`
+- Install ts-node globally with `npm install -g ts-node`
+- Install dependencies with `npm install`
+- Set up environment variables
+
 ```
-
-```sh
 # Configure your API port
-API_PORT=5000
+PORT=5000
 
-# Auth0 Config
-APP_BASE_URL=http://localhost:5000 
-AUTH0_ISSUER_BASE_URL=https://fabianferno.eu.auth0.com/ 
+# Log level
+LOG_LEVEL=combined
 
-# MongoDB Config
-MONGO_DB_URI="YOUR_MONGO_DB_URI"
+# Secret key for JWT
+JWT_SECRET=
+
+# MongoDB connection string
+DATABASE_URL=
+
 ```
 
-```bash
-npm run dev
-```
-
-
-## License
-
-This project is licensed under the MIT license. See the [LICENSE](./LICENSE.txt) file for more info.
+- Run `npm run dev` to start the server (in development mode), or `npm run start` to start the server (in production mode)
