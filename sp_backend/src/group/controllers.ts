@@ -224,7 +224,7 @@ async function redistributeController(
   res: Response,
   next: NextFunction
 ) {
-  const groupId = req.params.id;
+  const groupId = req.params.groupId;
 
   // Fetch group
   const group = await getGroupById(groupId);
